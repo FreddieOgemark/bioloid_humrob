@@ -57,18 +57,9 @@ function tournamentSelection(population, fitness)
 		worserInd = ind1
 	end
 	if (math.random() < simGetFloatSignal('pTour')) then
-		-- pick best one
-		--for j=1,genomeSize do
-		--	newGenomes[i][j] = population[betterInd][j]
-		--end
 		winnerGenome = arrayClone(population[betterInd])
 	else
-		-- pick worse one
-		--for j=1,genomeSize do
-		--	newGenomes[i][j] = population[betterInd][j]
-		--end
 		winnerGenome = arrayClone(population[worserInd])
-		--newGenomes[i] = population[worserInd]
 	end
 	return winnerGenome
 end
@@ -101,6 +92,14 @@ function mutate(genome)
 		genome[3] = genome[3] + (math.random()*0.8-0.4)
 	end
 	return genome
+end
+
+function initializeRobot(robotHandle, genome)
+	startPosX = genome[1]
+	startPosY = genome[2]
+	startRot = genome[3]
+	simSetObjectPosition(robotHandle,sim_handle_parent,{startPosX,startPosY,0})
+	simSetObjectOrientation(robotHandle,sim_handle_parent,{0,0,startRot})
 end
 
 -- DO NOT WRITE CODE OUTSIDE OF THE if-then-end SECTIONS BELOW!! (unless the code is a function definition)
@@ -196,20 +195,13 @@ if (sim_call_type==sim_childscriptcall_actuation) then
 	end
 
 	if (robotIsFinished == true) then
-		-- TODO must now initialise the new individual
+		-- must now initialise the new individual
+		initializeRobot(robotHandle, currentGenomes[individualNr])
 		simSetScriptSimulationParameter(robotScriptHandle, "isFinished", "false")
 
-		startPosX = currentGenomes[individualNr][1]
-		startPosY = currentGenomes[individualNr][2]
-		startRot = currentGenomes[individualNr][3]
-		simSetObjectPosition(robotHandle,sim_handle_parent,{startPosX,startPosY,0})
-		simSetObjectOrientation(robotHandle,sim_handle_parent,{0,0,startRot})
 		simAddStatusbarMessage("")
 		simAddStatusbarMessage("Robot was reset")
-		simAddStatusbarMessage("Current individual:")
-		simAddStatusbarMessage(tostring(individualNr))
-		simAddStatusbarMessage("Current generation:")
-		simAddStatusbarMessage(tostring(generationNr))
+		simAddStatusbarMessage("Generation " .. tostring(generationNr) .. ", individual " .. tostring(individualNr))
 	end
 end
 
@@ -223,10 +215,8 @@ end
 
 if (sim_call_type==sim_childscriptcall_cleanup) then
 
-	simAddStatusbarMessage("THIS IS PRINTED ON CLEANUP")
-
-	-- find the best individual
-
+	simAddStatusbarMessage("")
+	simAddStatusbarMessage("CLEANUP")
 	-- Print info or save to file or something
 	simAddStatusbarMessage("Best genome during the whole simulation:")
 	simAddStatusbarMessage(genomeToString(bestGenome))
