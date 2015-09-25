@@ -78,10 +78,15 @@ if (sim_call_type==sim_childscriptcall_actuation) then
 				bestInGenerationIndex = i
 			end
 		end
-		bestGenome = currentGenomes[bestInGenerationIndex]
+		bestInGenGenome = currentGenomes[bestInGenerationIndex]
 		simAddStatusbarMessage("Index of best in generation: " .. tostring(bestInGenerationIndex))
-		simAddStatusbarMessage("Genome: (" .. bestGenome[1] .. ", " .. bestGenome[2] .. ", " .. bestGenome[3])
+		simAddStatusbarMessage("Genome: " .. genomeToString(bestInGenGenome))
 		newGenomes[1] = currentGenomes[bestInGenerationIndex]
+		if (currentFitness[bestInGenerationIndex] > bestFitness) then
+			-- Save the globally best genome
+			bestFitness = currentFitness[bestInGenerationIndex]
+			bestGenome = currentGenomes[bestInGenerationIndex]
+		end
 		for i=2,simGetIntegerSignal('nrIndividualsPerGeneration') do
 			newGenomes[i] = {}     -- create a new row
 			-- pick two individuals and to tournament selection
@@ -141,7 +146,7 @@ if (sim_call_type==sim_childscriptcall_actuation) then
 		end
 		currentGenomes = newGenomes
 		firstGenome = currentGenomes[1]
-		simAddStatusbarMessage("Genome: (" .. firstGenome[1] .. ", " .. firstGenome[2] .. ", " .. firstGenome[3])
+		simAddStatusbarMessage("Genome: " .. genomeToString(firstGenome))
 
 		-- increase generation count and reset individual count
 		generationNr = generationNr+1
@@ -178,8 +183,24 @@ if (sim_call_type==sim_childscriptcall_cleanup) then
 
 	simAddStatusbarMessage("THIS IS PRINTED ON CLEANUP")
 
-	-- TODO find the best individual
+	-- find the best individual
 
-	-- TODO Print info or save to file or something
+	-- Print info or save to file or something
+	simAddStatusbarMessage("Best genome during the whole simulation:")
+	simAddStatusbarMessage(genomeToString(bestGenome))
+end
 
+function genomeToString (genome)
+	output = "("
+	for i=1,genomeSize do
+		output = output .. genome[i] .. ", "
+	end
+	output = string.sub(output, 1, string.len(output)-2)
+	output = output .. ")"
+	return output
+end
+
+function incCount (n)
+	n = n or 1
+	count = count + n
 end
