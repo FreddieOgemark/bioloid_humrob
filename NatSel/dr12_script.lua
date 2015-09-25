@@ -90,12 +90,13 @@ if (sim_call_type==sim_childscriptcall_actuation) then
 	minScore=999999
 	maxScore=-1
 	for i=1,#allScores,1 do
-		if (minScore>allScores[i]) then
-			minScore=allScores[i]
+		currentScore = allScores[i]
+		if (minScore>currentScore) then
+			minScore=currentScore
 			minHandle=scriptHandles[i]
 		end
-		if (maxScore<allScores[i]) then
-			maxScore=allScores[i]
+		if (maxScore<currentScore) then
+			maxScore=currentScore
 			maxHandle=scriptHandles[i]
 		end
 	end
