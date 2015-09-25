@@ -17,13 +17,90 @@ function initializeGenome ()
 	return genome
 end
 
-function getFitness ()
+function getFitness(genome)
 	-- calculate robot's score/fitness
 	-- distance from robot's start location
 	robotPos = simGetObjectPosition(robotHandle, -1)
-	robotGenome = currentGenomes[individualNr]
+	robotGenome = genome
 	travelledDist = math.sqrt(math.pow(robotPos[1] - robotGenome[1], 2) + math.pow(robotPos[2] - robotGenome[2], 2))
 	return travelledDist
+end
+
+function findBestInGenerationIndex()
+	bestInGenerationIndex = 1
+	for i=2,simGetIntegerSignal('nrIndividualsPerGeneration') do
+		-- find best in generation
+		if (currentFitness[i] > currentFitness[bestInGenerationIndex]) then
+			bestInGenerationIndex = i
+		end
+	end
+	return bestInGenerationIndex
+end
+
+function arrayClone(original)
+	clone = {}
+	for i=1, #original do
+		clone[i] = original[i]
+	end
+	return clone
+end
+
+function tournamentSelection(population, fitness)
+	winnerGenome = {}
+	ind1 = math.random( #population )
+	ind2 = math.random( #population )
+	if (fitness[ind1] > fitness[ind2]) then
+		betterInd = ind1
+		worserInd = ind2
+	else
+		betterInd = ind2
+		worserInd = ind1
+	end
+	if (math.random() < simGetFloatSignal('pTour')) then
+		-- pick best one
+		--for j=1,genomeSize do
+		--	newGenomes[i][j] = population[betterInd][j]
+		--end
+		winnerGenome = arrayClone(population[betterInd])
+	else
+		-- pick worse one
+		--for j=1,genomeSize do
+		--	newGenomes[i][j] = population[betterInd][j]
+		--end
+		winnerGenome = arrayClone(population[worserInd])
+		--newGenomes[i] = population[worserInd]
+	end
+	return winnerGenome
+end
+
+function mutate(genome)
+	if (math.random() < simGetFloatSignal('pMut')) then
+		-- mutate the start posX
+		genome[1] = genome[1] + (math.random()*0.2-0.1)
+		
+		-- make sure position is valid
+		if (genome[1] < -2.5) then
+			genome[1] = -2.5
+		elseif (genome[1] > 2.5) then
+			genome[1] = 2.5
+		end
+	end
+	if (math.random() < simGetFloatSignal('pMut')) then
+		-- mutate the start posY
+		genome[2] = genome[2] + (math.random()*0.2-0.1)
+		
+		-- make sure position is valid
+		if (genome[2] < -2.5) then
+			genome[2] = -2.5
+		elseif (genome[2] > 2.5) then
+			genome[2] = 2.5
+		end
+	end
+	if (math.random() < simGetFloatSignal('pMut')) then
+		-- mutate the start rotation
+		genome[3] = genome[3] + (math.random()*0.8-0.4)
+	end
+	return genome
 end
 
 -- DO NOT WRITE CODE OUTSIDE OF THE if-then-end SECTIONS BELOW!! (unless the code is a function definition)
@@ -72,7 +149,7 @@ if (sim_call_type==sim_childscriptcall_actuation) then
 		simAddStatusbarMessage("Robot is finished")
 
 		-- get robot's score/fitness
-		currentFitness[individualNr] = getFitness()
+		currentFitness[individualNr] = getFitness(currentGenomes[individualNr])
 		simAddStatusbarMessage("Fitness: " .. currentFitness[individualNr])
 
 		-- increase individual count
@@ -88,79 +165,27 @@ if (sim_call_type==sim_childscriptcall_actuation) then
 		-- create new generation from the previous one
 		newGenomes = {}
 		-- ELITISM
-		bestInGenerationIndex = 1
-		for i=2,simGetIntegerSignal('nrIndividualsPerGeneration') do
-			-- find best in generation
-			if (currentFitness[i] > currentFitness[bestInGenerationIndex]) then
-				bestInGenerationIndex = i
-			end
-		end
-		bestInGenGenome = currentGenomes[bestInGenerationIndex]
+		bestInGenerationIndex = findBestInGenerationIndex()
 		simAddStatusbarMessage("Index of best in generation: " .. tostring(bestInGenerationIndex))
-		simAddStatusbarMessage("Genome: " .. genomeToString(bestInGenGenome))
+		simAddStatusbarMessage("Genome: " .. genomeToString(currentGenomes[bestInGenerationIndex]))
 		newGenomes[1] = currentGenomes[bestInGenerationIndex]
 		if (currentFitness[bestInGenerationIndex] > bestFitness) then
 			-- Save the globally best genome
 			bestFitness = currentFitness[bestInGenerationIndex]
 			bestGenome = currentGenomes[bestInGenerationIndex]
 		end
+
 		for i=2,simGetIntegerSignal('nrIndividualsPerGeneration') do
 			newGenomes[i] = {}     -- create a new row
-			-- pick two individuals and to tournament selection
-			ind1 = math.random( #currentGenomes )
-			ind2 = math.random( #currentGenomes )
-			if (currentFitness[ind1] > currentFitness[ind2]) then
-				betterInd = ind1
-				worserInd = ind2
-			else
-				betterInd = ind2
-				worserInd = ind1
-			end
-			if (math.random() < simGetFloatSignal('pTour')) then
-				-- pick best one
-				for j=1,genomeSize do
-					newGenomes[i][j] = currentGenomes[betterInd][j]
-				end
-				--newGenomes[i] = currentGenomes[betterInd]
-			else
-				-- pick worse one
-				for j=1,genomeSize do
-					newGenomes[i][j] = currentGenomes[betterInd][j]
-				end
-				--newGenomes[i] = currentGenomes[worserInd]
-			end
+			
+			-- do tournament selection
+			winnerGenome = tournamentSelection(currentGenomes, currentFitness)
+			newGenomes[i] = winnerGenome
 
 			-- MUTATION
-			if (math.random() < simGetFloatSignal('pMut')) then
-				-- mutate the start posX
-				newGenomes[i][1] = newGenomes[i][1] + (math.random()*0.2-0.1)
-				
-				-- make sure position is valid
-				if (newGenomes[i][1] < -2.5) then
-					newGenomes[i][1] = -2.5
-				elseif (newGenomes[i][1] > 2.5) then
-					newGenomes[i][1] = 2.5
-				end
-			end
-			if (math.random() < simGetFloatSignal('pMut')) then
-				-- mutate the start posY
-				newGenomes[i][2] = newGenomes[i][2] + (math.random()*0.2-0.1)
-				
-				-- make sure position is valid
-				if (newGenomes[i][2] < -2.5) then
-					newGenomes[i][2] = -2.5
-				elseif (newGenomes[i][2] > 2.5) then
-					newGenomes[i][2] = 2.5
-				end
-			end
-			if (math.random() < simGetFloatSignal('pMut')) then
-				-- mutate the start rotation
-				newGenomes[i][3] = newGenomes[i][3] + (math.random()*0.8-0.4)
-			end
-
-			-- reset fitness
-			--currentFitness[i] = 0
+			newGenomes[i] = mutate(newGenomes[i])
 		end
+
 		currentGenomes = newGenomes
 		firstGenome = currentGenomes[1]
 		simAddStatusbarMessage("Genome: " .. genomeToString(firstGenome))
