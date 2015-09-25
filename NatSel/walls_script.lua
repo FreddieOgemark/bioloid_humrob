@@ -17,11 +17,20 @@ function initializeGenome ()
 	return genome
 end
 
+function getFitness ()
+	-- calculate robot's score/fitness
+	-- distance from robot's start location
+	robotPos = simGetObjectPosition(robotHandle, -1)
+	robotGenome = currentGenomes[individualNr]
+	travelledDist = math.sqrt(math.pow(robotPos[1] - robotGenome[1], 2) + math.pow(robotPos[2] - robotGenome[2], 2))
+	return travelledDist
+end
+
 -- DO NOT WRITE CODE OUTSIDE OF THE if-then-end SECTIONS BELOW!! (unless the code is a function definition)
 
 if (sim_call_type==sim_childscriptcall_initialization) then
 
-	-- Put some initialization code here
+	-- Initialization of evolutionary algorithm
 	simAddStatusbarMessage("Initializing evolutionary algorithm")
 
 	robotNameID = "dr12_robot_"
@@ -42,7 +51,7 @@ if (sim_call_type==sim_childscriptcall_initialization) then
     for i=1,simGetIntegerSignal('nrIndividualsPerGeneration') do
 		currentGenomes[i] = initializeGenome()
     end
-	genomeSize = #currentGenomes[1] -- posx, posy, rotation
+	genomeSize = #currentGenomes[1] -- length of first genome
 	
 	-- best fitness is just a number
 	bestFitness = 0
@@ -50,31 +59,21 @@ if (sim_call_type==sim_childscriptcall_initialization) then
 	bestGenome = {}
 	
 	simAddStatusbarMessage("EA initialized")
-
 end
 
 
 if (sim_call_type==sim_childscriptcall_actuation) then
 
-	-- Put your main ACTUATION code here
-	
-
-	-- actual code :D
+	-- Called every frame (or something like that)
 	robotScriptHandle = simGetScriptHandle(robotNameID)
 	robotHandle = simGetObjectHandle(robotNameID)
 	robotIsFinished = simGetScriptSimulationParameter(robotScriptHandle, "isFinished")
 	if (robotIsFinished == true) then
 		simAddStatusbarMessage("Robot is finished")
 
-		-- CHANGE: calculate and save robot's score/fitness
-		-- distance from robot's start location
-		robotPos = simGetObjectPosition(robotHandle, -1)
-		robotGenome = currentGenomes[individualNr]
-		travelledDist = math.sqrt(math.pow(robotPos[1] - robotGenome[1], 2) + math.pow(robotPos[2] - robotGenome[2], 2))
-		simAddStatusbarMessage("Distance travelled")
-		simAddStatusbarMessage(tostring(travelledDist))
-		currentFitness[individualNr] = travelledDist
-		
+		-- get robot's score/fitness
+		currentFitness[individualNr] = getFitness()
+		simAddStatusbarMessage("Fitness: " .. currentFitness[individualNr])
 
 		-- increase individual count
 		individualNr = individualNr+1
@@ -206,4 +205,5 @@ if (sim_call_type==sim_childscriptcall_cleanup) then
 	-- Print info or save to file or something
 	simAddStatusbarMessage("Best genome during the whole simulation:")
 	simAddStatusbarMessage(genomeToString(bestGenome))
+	simAddStatusbarMessage("Fitness of best genome: " .. tostring(bestFitness))
 end
