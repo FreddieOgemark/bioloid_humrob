@@ -1,9 +1,30 @@
+
+function genomeToString (genome)
+	output = "("
+	for i=1,genomeSize do
+		output = output .. genome[i] .. ", "
+	end
+	output = string.sub(output, 1, string.len(output)-2)
+	output = output .. ")"
+	return output
+end
+
+function initializeGenome ()
+	genome = {}
+	genome[1] = -2.5+math.random()*5 -- posX
+	genome[2] = -2.5+math.random()*5 -- posY
+	genome[3] = math.random()*2*math.pi -- orientation
+	return genome
+end
+
 -- DO NOT WRITE CODE OUTSIDE OF THE if-then-end SECTIONS BELOW!! (unless the code is a function definition)
 
 if (sim_call_type==sim_childscriptcall_initialization) then
 
 	-- Put some initialization code here
-	simAddStatusbarMessage("Setting values")
+	simAddStatusbarMessage("Initializing evolutionary algorithm")
+
+	robotNameID = "dr12_robot_"
 	generationNr = 1
 	individualNr = 1
 	simSetIntegerSignal('nrIndividualsPerGeneration',20)
@@ -16,22 +37,19 @@ if (sim_call_type==sim_childscriptcall_initialization) then
 		currentFitness[i] = 0
     end
 
-	-- genomes stored in matrix of size (nrIndividuals, ...)
-	genomeSize = 3 -- posx, posy, rotation
+	-- genomes stored in matrix of size (nrIndividuals, genomeSize)
 	currentGenomes = {}          -- create the matrix
     for i=1,simGetIntegerSignal('nrIndividualsPerGeneration') do
-		currentGenomes[i] = {}     -- create a new row
-		currentGenomes[i][1] = -2.5+math.random()*5
-		currentGenomes[i][2] = -2.5+math.random()*5
-		currentGenomes[i][3] = math.random()*2*math.pi
+		currentGenomes[i] = initializeGenome()
     end
+	genomeSize = #currentGenomes[1] -- posx, posy, rotation
 	
 	-- best fitness is just a number
 	bestFitness = 0
 	-- best genome is an array
 	bestGenome = {}
 	
-	simAddStatusbarMessage("Values are set")
+	simAddStatusbarMessage("EA initialized")
 
 end
 
@@ -42,8 +60,8 @@ if (sim_call_type==sim_childscriptcall_actuation) then
 	
 
 	-- actual code :D
-	robotScriptHandle = simGetScriptHandle("dr12_robot_")
-	robotHandle = simGetObjectHandle("dr12_robot_")
+	robotScriptHandle = simGetScriptHandle(robotNameID)
+	robotHandle = simGetObjectHandle(robotNameID)
 	robotIsFinished = simGetScriptSimulationParameter(robotScriptHandle, "isFinished")
 	if (robotIsFinished == true) then
 		simAddStatusbarMessage("Robot is finished")
@@ -188,19 +206,4 @@ if (sim_call_type==sim_childscriptcall_cleanup) then
 	-- Print info or save to file or something
 	simAddStatusbarMessage("Best genome during the whole simulation:")
 	simAddStatusbarMessage(genomeToString(bestGenome))
-end
-
-function genomeToString (genome)
-	output = "("
-	for i=1,genomeSize do
-		output = output .. genome[i] .. ", "
-	end
-	output = string.sub(output, 1, string.len(output)-2)
-	output = output .. ")"
-	return output
-end
-
-function incCount (n)
-	n = n or 1
-	count = count + n
 end
