@@ -1,7 +1,7 @@
 
-function genomeToString (genome)
+function genomeToString(genome)
 	output = "("
-	for i=1,genomeSize do
+	for i=1, #genome do
 		output = output .. genome[i] .. ", "
 	end
 	output = string.sub(output, 1, string.len(output)-2)
@@ -9,16 +9,26 @@ function genomeToString (genome)
 	return output
 end
 
-function initializeGenome ()
+function getGenomeRange()
+	-- Returns a list of pairs, where the first element is "min" and the second is "max"
+	ranges = {}
+	ranges[1] = {-2.5, 2.5} -- posX
+	ranges[2] = {-2.5, 2.5} -- posY
+	ranges[3] = {0, 2*math.pi} -- orientation
+	ranges[4] = {0.6, 1.2} -- max speed
+	ranges[5] = {0.1, 0.3} -- min speed
+	ranges[6] = {5*math.pi/180, 90*math.pi/180} -- sweep speed
+	ranges[7] = {-0.1, 2} -- detection persistence
+	ranges[8] = {0.1, 0.7} -- detection distance
+	return ranges
+end
+
+function initializeGenome()
 	genome = {}
-	genome[1] = -2.5 + math.random()*5 -- posX
-	genome[2] = -2.5 + math.random()*5 -- posY
-	genome[3] = math.random()*2*math.pi -- orientation
-	genome[4] = 0.4 + math.random()*0.8 -- max speed
-	genome[5] = 0.1 + math.random()*0.2 -- min speed
-	genome[6] = 5*math.pi/180 + math.random()*85*math.pi/180 -- sweep speed
-	genome[7] = -0.1 + math.random()*2 -- detection persistence
-	genome[8] = 0.1 + math.random()*0.7 -- detection distance
+	ranges = getGenomeRange()
+	for i=1, #ranges do
+		genome[i] = ranges[i][1] + math.random()*(ranges[i][2]-ranges[i][1])
+	end
 	return genome
 end
 
@@ -26,8 +36,7 @@ function getFitness(genome)
 	-- calculate robot's score/fitness
 	-- distance from robot's start location
 	robotPos = simGetObjectPosition(robotHandle, -1)
-	robotGenome = genome
-	travelledDist = math.sqrt(math.pow(robotPos[1] - robotGenome[1], 2) + math.pow(robotPos[2] - robotGenome[2], 2))
+	travelledDist = math.sqrt(math.pow(robotPos[1] - genome[1], 2) + math.pow(robotPos[2] - genome[2], 2))
 	return travelledDist
 end
 
@@ -79,59 +88,15 @@ function tournamentSelection(population, fitness)
 end
 
 function mutate(genome)
-	if (math.random() < simGetFloatSignal('pMut')) then
-		-- mutate the start posX
-		genome[1] = genome[1] + (math.random()*0.2-0.1)
-		
-		-- make sure position is valid
-		genome[1] = clampValue(genome[1], -2.5, 2.5)
-	end
-	if (math.random() < simGetFloatSignal('pMut')) then
-		-- mutate the start posY
-		genome[2] = genome[2] + (math.random()*0.2-0.1)
-		
-		-- make sure position is valid
-		genome[2] = clampValue(genome[2], -2.5, 2.5)
-	end
-	if (math.random() < simGetFloatSignal('pMut')) then
-		-- mutate the start rotation
-		genome[3] = genome[3] + (math.random()*0.8-0.4)
-	end
-
-	if (math.random() < simGetFloatSignal('pMut')) then
-		-- mutate the max speed
-		genome[4] = genome[4] + (math.random()*0.2-0.1)
-		
-		-- make sure value is valid
-		genome[4] = clampValue(genome[4], 0.4, 1.2)
-	end
-	if (math.random() < simGetFloatSignal('pMut')) then
-		-- mutate the min speed
-		genome[5] = genome[5] + (math.random()*0.1-0.05)
-		
-		-- make sure value is valid
-		genome[5] = clampValue(genome[5], 0.1, 0.3)
-	end
-	if (math.random() < simGetFloatSignal('pMut')) then
-		-- mutate the sweep speed
-		genome[6] = genome[6] + (math.random()*0.2-0.1)
-		
-		-- make sure value is valid
-		genome[6] = clampValue(genome[6], 5*math.pi/180, 90*math.pi/180)
-	end
-	if (math.random() < simGetFloatSignal('pMut')) then
-		-- mutate the detection persistence
-		genome[7] = genome[7] + (math.random()*0.2-0.1)
-		
-		-- make sure value is valid
-		genome[7] = clampValue(genome[7], -0.1, 1.9)
-	end
-	if (math.random() < simGetFloatSignal('pMut')) then
-		-- mutate the detection distance
-		genome[8] = genome[8] + (math.random()*0.2-0.1)
-		
-		-- make sure value is valid
-		genome[8] = clampValue(genome[8], 0.1, 0.8)
+	ranges = getGenomeRange()
+	for i=1, #ranges do
+		if (math.random() < simGetFloatSignal('pMut')) then
+			change = (ranges[i][2] - ranges[i][1])*0.1 -- 10 % of interval = max-min
+			-- mutate
+			genome[i] = genome[i] + (math.random()*change - change/2)
+			-- make sure value is valid
+			genome[i] = clampValue(genome[i], ranges[i][1], ranges[i][2])
+		end
 	end
 	return genome
 end
