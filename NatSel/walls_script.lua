@@ -11,9 +11,14 @@ end
 
 function initializeGenome ()
 	genome = {}
-	genome[1] = -2.5+math.random()*5 -- posX
-	genome[2] = -2.5+math.random()*5 -- posY
+	genome[1] = -2.5 + math.random()*5 -- posX
+	genome[2] = -2.5 + math.random()*5 -- posY
 	genome[3] = math.random()*2*math.pi -- orientation
+	genome[4] = 0.4 + math.random()*0.8 -- max speed
+	genome[5] = 0.1 + math.random()*0.2 -- min speed
+	genome[6] = 5*math.pi/180 + math.random()*85*math.pi/180 -- sweep speed
+	genome[7] = -0.1 + math.random()*2 -- detection persistence
+	genome[8] = 0.1 + math.random()*0.7 -- detection distance
 	return genome
 end
 
@@ -45,6 +50,15 @@ function arrayClone(original)
 	return clone
 end
 
+function clampValue(value, min, max)
+	if (value < min) then
+		value = min
+	elseif (value > max) then
+		value = max
+	end
+	return value
+end
+
 function tournamentSelection(population, fitness)
 	winnerGenome = {}
 	ind1 = math.random( #population )
@@ -70,36 +84,76 @@ function mutate(genome)
 		genome[1] = genome[1] + (math.random()*0.2-0.1)
 		
 		-- make sure position is valid
-		if (genome[1] < -2.5) then
-			genome[1] = -2.5
-		elseif (genome[1] > 2.5) then
-			genome[1] = 2.5
-		end
+		genome[1] = clampValue(genome[1], -2.5, 2.5)
 	end
 	if (math.random() < simGetFloatSignal('pMut')) then
 		-- mutate the start posY
 		genome[2] = genome[2] + (math.random()*0.2-0.1)
 		
 		-- make sure position is valid
-		if (genome[2] < -2.5) then
-			genome[2] = -2.5
-		elseif (genome[2] > 2.5) then
-			genome[2] = 2.5
-		end
+		genome[2] = clampValue(genome[2], -2.5, 2.5)
 	end
 	if (math.random() < simGetFloatSignal('pMut')) then
 		-- mutate the start rotation
 		genome[3] = genome[3] + (math.random()*0.8-0.4)
 	end
+
+	if (math.random() < simGetFloatSignal('pMut')) then
+		-- mutate the max speed
+		genome[4] = genome[4] + (math.random()*0.2-0.1)
+		
+		-- make sure value is valid
+		genome[4] = clampValue(genome[4], 0.4, 1.2)
+	end
+	if (math.random() < simGetFloatSignal('pMut')) then
+		-- mutate the min speed
+		genome[5] = genome[5] + (math.random()*0.1-0.05)
+		
+		-- make sure value is valid
+		genome[5] = clampValue(genome[5], 0.1, 0.3)
+	end
+	if (math.random() < simGetFloatSignal('pMut')) then
+		-- mutate the sweep speed
+		genome[6] = genome[6] + (math.random()*0.2-0.1)
+		
+		-- make sure value is valid
+		genome[6] = clampValue(genome[6], 5*math.pi/180, 90*math.pi/180)
+	end
+	if (math.random() < simGetFloatSignal('pMut')) then
+		-- mutate the detection persistence
+		genome[7] = genome[7] + (math.random()*0.2-0.1)
+		
+		-- make sure value is valid
+		genome[7] = clampValue(genome[7], -0.1, 1.9)
+	end
+	if (math.random() < simGetFloatSignal('pMut')) then
+		-- mutate the detection distance
+		genome[8] = genome[8] + (math.random()*0.2-0.1)
+		
+		-- make sure value is valid
+		genome[8] = clampValue(genome[8], 0.1, 0.8)
+	end
 	return genome
 end
 
-function initializeRobot(robotHandle, genome)
+function initializeRobot(robotHandle, robotScriptHandle, genome)
 	startPosX = genome[1]
 	startPosY = genome[2]
 	startRot = genome[3]
+	maxSpeed = genome[4]
+	minSpeed = genome[5]
+	sweepSpeed = genome[6]
+	detectionPersistence = genome[7]
+	detectionDistance = genome[8]
+
 	simSetObjectPosition(robotHandle,sim_handle_parent,{startPosX,startPosY,0})
 	simSetObjectOrientation(robotHandle,sim_handle_parent,{0,0,startRot})
+
+	simSetScriptSimulationParameter(robotScriptHandle,'maxSpeed',maxSpeed)
+	simSetScriptSimulationParameter(robotScriptHandle,'minSpeed',minSpeed)
+	simSetScriptSimulationParameter(robotScriptHandle,'sweepSpeed',sweepSpeed)
+	simSetScriptSimulationParameter(robotScriptHandle,'detectionPersistence',detectionPersistence)
+	simSetScriptSimulationParameter(robotScriptHandle,'detectionDistance',detectionDistance)
 end
 
 -- DO NOT WRITE CODE OUTSIDE OF THE if-then-end SECTIONS BELOW!! (unless the code is a function definition)
@@ -114,7 +168,7 @@ if (sim_call_type==sim_childscriptcall_initialization) then
 	individualNr = 1
 	simSetIntegerSignal('nrIndividualsPerGeneration',20)
 	simSetFloatSignal('pTour',0.75)
-	simSetFloatSignal('pMut',0.05)
+	simSetFloatSignal('pMut',0.1)
 
 	-- fitness stored in an array of length nrIndividuals
 	currentFitness = {}    -- new array
@@ -196,7 +250,7 @@ if (sim_call_type==sim_childscriptcall_actuation) then
 
 	if (robotIsFinished == true) then
 		-- must now initialise the new individual
-		initializeRobot(robotHandle, currentGenomes[individualNr])
+		initializeRobot(robotHandle, robotScriptHandle, currentGenomes[individualNr])
 		simSetScriptSimulationParameter(robotScriptHandle, "isFinished", "false")
 
 		simAddStatusbarMessage("")

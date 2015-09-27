@@ -1,3 +1,4 @@
+
 if (sim_call_type==sim_childscriptcall_initialization) then 
 	simSetScriptSimulationParameter(sim_handle_self,'isFinished',"false")
 end 
@@ -8,26 +9,26 @@ end
 
 if (sim_call_type==sim_childscriptcall_actuation) then
 
-	if (simGetIntegerSignal("desiredRobotCount")==nil) then
-		-- desiredRobotCount wasn't set yet. 
-		if (dlgHandle==nil) then
-			-- ask how many robots are wanted!
-			dlgHandle=simDisplayDialog('Robot count','How many robots should participate in the natural selection game?',sim_dlgstyle_input,false,'5')
-		end
-		if (simGetDialogResult(dlgHandle)==sim_dlgret_still_open) then
-			return -- The ok button wasn't clicked yet
-		end
-		robotCount=tonumber(simGetDialogInput(dlgHandle)) -- We retrieve the input value
-		simEndDialog(dlgHandle) -- we end the dialog
-		if (robotCount==nil) then
-			robotCount=5
-		end
-		if (robotCount<2) then
-			robotCount=2
-		end
-		simSetIntegerSignal("desiredRobotCount",robotCount) -- we set the number of robots desired
-		simSetIntegerSignal("lastRobotRemovalTime",0)
-	end
+--	if (simGetIntegerSignal("desiredRobotCount")==nil) then
+--		-- desiredRobotCount wasn't set yet. 
+--		if (dlgHandle==nil) then
+--			-- ask how many robots are wanted!
+--			dlgHandle=simDisplayDialog('Robot count','How many robots should participate in the natural selection game?',sim_dlgstyle_input,false,'5')
+--		end
+--		if (simGetDialogResult(dlgHandle)==sim_dlgret_still_open) then
+--			return -- The ok button wasn't clicked yet
+--		end
+--		robotCount=tonumber(simGetDialogInput(dlgHandle)) -- We retrieve the input value
+--		simEndDialog(dlgHandle) -- we end the dialog
+--		if (robotCount==nil) then
+--			robotCount=5
+--		end
+--		if (robotCount<2) then
+--			robotCount=2
+--		end
+--		simSetIntegerSignal("desiredRobotCount",robotCount) -- we set the number of robots desired
+--		simSetIntegerSignal("lastRobotRemovalTime",0)
+--	end
 	
 	if (firstPass==nil) then
 		firstPass=true
@@ -103,22 +104,22 @@ if (sim_call_type==sim_childscriptcall_actuation) then
 	
 	copyRobot=false
 	removeRobot=false
-	if (#allScores<robotCount) then
-		-- We don't have enough robots, we duplicate the best performer:
-		if (simGetScriptHandle()==maxHandle) then
-			copyRobot=true
-		end
-	else
-		if (simGetScriptHandle()==minHandle) then
-			-- Do we have to remove this robot? (this one is the worst performer)
-			if (#allScores>robotCount) then
-				removeRobot=true -- yes because we have too many robots
-			end
-			if (simGetSimulationTime()-simGetIntegerSignal('lastRobotRemovalTime')>10) then
-				removeRobot=true -- yes because too much time has passed since we remove one robot
-			end
-		end
-	end
+--	if (#allScores<robotCount) then
+--		-- We don't have enough robots, we duplicate the best performer:
+--		if (simGetScriptHandle()==maxHandle) then
+--			copyRobot=true
+--		end
+--	else
+--		if (simGetScriptHandle()==minHandle) then
+--			-- Do we have to remove this robot? (this one is the worst performer)
+--			if (#allScores>robotCount) then
+--				removeRobot=true -- yes because we have too many robots
+--			end
+--			if (simGetSimulationTime()-simGetIntegerSignal('lastRobotRemovalTime')>10) then
+--				removeRobot=true -- yes because too much time has passed since we remove one robot
+--			end
+--		end
+--	end
 	
 --	if (copyRobot) then
 --		originalSelection=simGetObjectSelection()
