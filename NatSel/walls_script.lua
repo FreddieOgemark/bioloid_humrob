@@ -87,10 +87,27 @@ function tournamentSelection(population, fitness)
 	return winnerGenome
 end
 
-function mutate(genome)
+function crossover(genome1, genome2)
+	crossoverIndex = math.random(#genome1)
+	for i=crossoverIndex, #genome1 do
+		-- assuming genomes have same length
+		tmp = genome1[i]
+		genome1[i] = genome2[i]
+		genome2[i] = tmp
+	end
+
+	-- to avoid bias, must switch between which is returned as long as only returning one genome
+	if (math.random() < 0.5) then
+		return genome1
+	else
+		return genome2
+	end
+end
+
+function mutate(genome, probMut)
 	ranges = getGenomeRange()
 	for i=1, #ranges do
-		if (math.random() < simGetFloatSignal('pMut')) then
+		if (math.random() < probMut) then
 			change = (ranges[i][2] - ranges[i][1])*0.1 -- 10 % of interval = max-min
 			-- mutate
 			genome[i] = genome[i] + (math.random()*change - change/2)
@@ -134,6 +151,7 @@ if (sim_call_type==sim_childscriptcall_initialization) then
 	simSetIntegerSignal('nrIndividualsPerGeneration',20)
 	simSetFloatSignal('pTour',0.75)
 	simSetFloatSignal('pMut',0.1)
+	simSetFloatSignal('pCross',0.5)
 
 	-- fitness stored in an array of length nrIndividuals
 	currentFitness = {}    -- new array
@@ -200,8 +218,14 @@ if (sim_call_type==sim_childscriptcall_actuation) then
 			winnerGenome = tournamentSelection(currentGenomes, currentFitness)
 			newGenomes[i] = winnerGenome
 
+			-- CROSSOVER (this version only saves one of the "crossovered")
+			if (math.random() < simGetFloatSignal('pCross')) then
+				otherGenome = tournamentSelection(currentGenomes, currentFitness)
+				newGenomes[i] = crossover(newGenomes[i], otherGenome)
+			end
+
 			-- MUTATION
-			newGenomes[i] = mutate(newGenomes[i])
+			newGenomes[i] = mutate(newGenomes[i], simGetFloatSignal('pMut'))
 		end
 
 		currentGenomes = newGenomes
