@@ -17,6 +17,7 @@ def evaluate_individual():
 def test():
     vrep.simxFinish(-1)
     clientID = vrep.simxStart('127.0.0.1', 19997, True, True, 1000, 5)
+    print('Connected to VREP.')
 
     if clientID != -1:
         # Get joint handles
@@ -35,7 +36,7 @@ def test():
 
         for i in range(0,100):
             # CPG network step
-            output = [0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0]
+            output = [-1.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0]
 
             # Set joint angles
             for i in range(0,len(handles)):
@@ -47,8 +48,9 @@ def test():
         # Stop simulation
         vrep.simxSynchronous(clientID, False)
         vrep.simxStopSimulation(clientID, vrep.simx_opmode_oneshot_wait)
-        vrep.simxFinish(clientID)
         print('Sim stopped.')
+        vrep.simxFinish(clientID)
+        print('Disconnected from VREP.')
 
 # uncomment the following line to test
 test()
