@@ -19,7 +19,7 @@ class MatsuokaJoint:
         du1 = 1/self.tu*(-self.u1-self.beta*self.v1+self.w12*self.y2+self.u0+input1)
         du2 = 1/self.tu*(-self.u2-self.beta*self.v2+self.w21*self.y1+self.u0+input2)
         self.u1 = self.u1 + timestep*du1
-        self.u2 = self.u2 + timestep*du1
+        self.u2 = self.u2 + timestep*du2
         dv1 = 1/self.tv*(-self.v1+self.y1)
         dv2 = 1/self.tv*(-self.v2+self.y2)
         self.v1 = self.v1 + timestep*dv1
