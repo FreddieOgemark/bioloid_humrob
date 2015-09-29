@@ -29,14 +29,14 @@ def evaluate_individual(weightMatrix):
 
         # Get handles
         _, pivotHandle = vrep.simxGetObjectHandle(clientID, 'Pivot', vrep.simx_opmode_oneshot_wait)
+        _, shoulderRightHandle = vrep.simxGetObjectHandle(clientID, 'Joint3', vrep.simx_opmode_oneshot_wait)
+        _, shoulderLeftHandle = vrep.simxGetObjectHandle(clientID, 'Joint4', vrep.simx_opmode_oneshot_wait)
 
         jointHandles = []
         for i in jointIndices:
             _, h = vrep.simxGetObjectHandle(clientID, 'Joint' + str(i), vrep.simx_opmode_oneshot_wait)
             jointHandles.append(h)
 
-        _, rightArm = vrep.simxGetObjectHandle(clientID, 'Joint3', vrep.simx_opmode_oneshot_wait)
-        _, leftArm = vrep.simxGetObjectHandle(clientID, 'Joint4', vrep.simx_opmode_oneshot_wait)
         print('Object handles received.')
 
         # Get bioloid handle
@@ -49,12 +49,15 @@ def evaluate_individual(weightMatrix):
 
         # Set initial joint angles
         for i in range(0,len(jointHandles)):
-            vrep.simxSetJointTargetPosition(clientID, jointHandles[i], jointOffsets[i], vrep.simx_opmode_oneshot_wait)
             vrep.simxSetJointPosition(clientID, jointHandles[i], jointOffsets[i], vrep.simx_opmode_oneshot_wait)
+            vrep.simxSetJointTargetPosition(clientID, jointHandles[i], jointOffsets[i], vrep.simx_opmode_oneshot_wait)
 
         # Set joints that are not considered by the optimizaton
-        vrep.simxSetJointPosition(clientID, rightArm, math.radians(80.0), vrep.simx_opmode_oneshot_wait)
-        vrep.simxSetJointPosition(clientID, leftArm, -math.radians(80.0), vrep.simx_opmode_oneshot_wait)
+        shoulderAngle = math.radians(80.0)
+        vrep.simxSetJointPosition(clientID, shoulderRightHandle, shoulderAngle, vrep.simx_opmode_oneshot_wait)
+        vrep.simxSetJointTargetPosition(clientID, shoulderRightHandle, shoulderAngle, vrep.simx_opmode_oneshot_wait)
+        vrep.simxSetJointPosition(clientID, shoulderLeftHandle, -shoulderAngle, vrep.simx_opmode_oneshot_wait)
+        vrep.simxSetJointTargetPosition(clientID, shoulderLeftHandle, -shoulderAngle, vrep.simx_opmode_oneshot_wait)
 
         # Evaluate for a number of integration steps
         totalDistance = 0
@@ -68,6 +71,9 @@ def evaluate_individual(weightMatrix):
             # Set joint angles
             for i in range(0,len(jointHandles)):
                 vrep.simxSetJointTargetPosition(clientID, jointHandles[i], jointOffsets[i] + jointAngles[i], vrep.simx_opmode_oneshot)
+
+            # VREP simulation step
+            vrep.simxSynchronousTrigger(clientID)
 
             # Measure how far forward the robot moves in this timestep
             if iteration % 10 == 0:
@@ -89,9 +95,6 @@ def evaluate_individual(weightMatrix):
                 # What is the distance along the forward vector?
                 forwardDistance = delta2D[0]*forward2D[0]+delta2D[1]*forward2D[1]
                 totalDistance += forwardDistance
-
-            # VREP simulation step
-            vrep.simxSynchronousTrigger(clientID)
 
         # Measure movement
         print('Total distance travelled (in any direction): ' + str(totalDistance))
