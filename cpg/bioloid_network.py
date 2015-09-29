@@ -45,5 +45,3 @@ def get_random_weights(a,b):
             innerWeights.append(-1+2*random.random())
         weights.append(innerWeights)
     return weights
-
-
