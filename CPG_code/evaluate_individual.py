@@ -33,6 +33,12 @@ def evaluate_individual():
         # Get bioloid handle
         _, torsoHandle = vrep.simxGetObjectHandle(clientID, 'Bioloid', vrep.simx_opmode_oneshot_wait)
 
+        # Get arm handles
+        _, rightArmHandle = vrep.simxGetObjectHandle(clientID, 'Joint3', vrep.simx_opmode_oneshot_wait)
+        _, leftArmHandle = vrep.simxGetObjectHandle(clientID, 'Joint4', vrep.simx_opmode_oneshot_wait)
+        _, rightShoulderHandle = vrep.simxGetObjectHandle(clientID, 'Joint1', vrep.simx_opmode_oneshot_wait)
+        _, leftShoulderHandle = vrep.simxGetObjectHandle(clientID, 'Joint2', vrep.simx_opmode_oneshot_wait)
+
         # Start simulation
         vrep.simxStartSimulation(clientID, vrep.simx_opmode_oneshot)
         vrep.simxSynchronous(clientID, True)
@@ -41,16 +47,21 @@ def evaluate_individual():
         totalDistance = 0
         _, lastPos = vrep.simxGetObjectPosition(clientID, torsoHandle, -1, vrep.simx_opmode_oneshot_wait)
 
+        #set arms into the right initial position
+        vrep.simxSetJointPosition(clientID, rightArmHandle, 1.39, vrep.simx_opmode_oneshot_wait)
+        vrep.simxSetJointPosition(clientID, leftArmHandle, -1.39, vrep.simx_opmode_oneshot_wait)
+        vrep.simxSetJointPosition(clientID, rightShoulderHandle, 1.57, vrep.simx_opmode_oneshot_wait)
+        vrep.simxSetJointPosition(clientID, leftShoulderHandle, 1.57, vrep.simx_opmode_oneshot_wait)
 
         weightMatrix = bioloid_network.get_random_weights(8,8)
-        bn = bioloid_network.BioloidNetwork(weightMatrix,0.01)
+        bn = bioloid_network.BioloidNetwork(weightMatrix,0.1)
         for iteration in range(0,1000):
             # CPG network step
             #output = [-1.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0]
-            output = bn.get_output()
+            #output = bn.get_output()
 
             # Set joint angles
-            for i in range(0,len(jointHandles)):
+            #for i in range(0,len(jointHandles)):
                 vrep.simxSetJointTargetPosition(clientID, jointHandles[i], output[i], vrep.simx_opmode_oneshot)
 
             # Measure how far the robot moved every 10th (for now) time step
