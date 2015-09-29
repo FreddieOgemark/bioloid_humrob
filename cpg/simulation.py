@@ -21,9 +21,14 @@ def evaluate_individual(weightMatrix):
     print('Connected to VREP.')
 
     if clientID != -1:
+        deltaTime = 0.01
+
         # Shoulders should point downwards by default!
         jointIndices = [15,13,9,12,14,16,1,2]
         jointOffsets = [0.0,0.0,0.0,0.0,0.0,0.0,-math.radians(90.0),-math.radians(90.0)]
+
+        # Get pivot handle
+        _, pivotHandle = vrep.simxGetObjectHandle(clientID, 'Pivot', vrep.simx_opmode_oneshot_wait)
 
         # Get joint handles
         jointHandles = []
@@ -59,10 +64,9 @@ def evaluate_individual(weightMatrix):
 
         # Evaluate for a number of integration steps
         totalDistance = 0
-        _, lastPos = vrep.simxGetObjectPosition(clientID, torsoHandle, -1, vrep.simx_opmode_oneshot_wait)
 
-        bn = bioloid_network.BioloidNetwork(weightMatrix, 0.01)
-        for iteration in range(0,400):
+        bn = bioloid_network.BioloidNetwork(weightMatrix, deltaTime)
+        for iteration in range(0,200):
             # CPG network step
             jointAngle = bn.get_output()
 
@@ -70,13 +74,20 @@ def evaluate_individual(weightMatrix):
             for i in range(0,len(jointHandles)):
                 vrep.simxSetJointTargetPosition(clientID, jointHandles[i], jointOffsets[i] + jointAngle[i], vrep.simx_opmode_oneshot)
 
-            # Measure how far the robot moved every 10th (for now) time step
-            if iteration % 10 == 0:
-                _, currPos = vrep.simxGetObjectPosition(clientID, torsoHandle, -1, vrep.simx_opmode_oneshot_wait)
-                delta = [ currPos[0] - lastPos[0], currPos[1] - lastPos[1] ]
-                distance = math.sqrt(delta[0]*delta[0] + delta[1]*delta[1])
-                lastPos = currPos
-                totalDistance += distance
+            # Measure how far forward the robot moves in this timestep
+            _, currVel, _ = vrep.simxGetObjectVelocity(clientID, torsoHandle, vrep.simx_opmode_oneshot_wait)
+            _, currLocalPos = vrep.simxGetObjectPosition(clientID, torsoHandle, pivotHandle, vrep.simx_opmode_oneshot_wait)
+
+            forward2D = [ currLocalPos[1], -currLocalPos[0] ]
+            forward2DLength = math.sqrt(forward2D[0]*forward2D[0]+forward2D[1]*forward2D[1])
+
+            if forward2DLength == 0.0:
+                forward2D = [0.0, 0.0]
+            else:
+                forward2D = [forward2D[0]/forward2DLength, forward2D[1]/forward2DLength]
+
+            forwardVel = currVel[0]*forward2D[0]+currVel[1]*forward2D[1]
+            totalDistance += forwardVel * deltaTime
 
             # VREP simulation step
             vrep.simxSynchronousTrigger(clientID)
