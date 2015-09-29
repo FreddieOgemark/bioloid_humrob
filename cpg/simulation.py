@@ -13,7 +13,7 @@ import time
 import math
 import bioloid_network
 
-def evaluate_individual():
+def evaluate_individual(weightMatrix):
     print('Evaluating individual...')
 
     vrep.simxFinish(-1)
@@ -21,10 +21,12 @@ def evaluate_individual():
     print('Connected to VREP.')
 
     if clientID != -1:
-        # Get joint handles
+        # Shoulders should point downwards by default!
         jointIndices = [15,13,9,12,14,16,1,2]
-        jointHandles = []
+        jointOffsets = [0.0,0.0,0.0,0.0,0.0,0.0,-math.radians(90.0),-math.radians(90.0)]
 
+        # Get joint handles
+        jointHandles = []
         for i in jointIndices:
             _, h = vrep.simxGetObjectHandle(clientID, 'Joint' + str(i), vrep.simx_opmode_oneshot_wait)
             jointHandles.append(h)
@@ -44,25 +46,29 @@ def evaluate_individual():
         vrep.simxSynchronous(clientID, True)
         print('Sim started.')
 
+        # Set initial joint angles
+        for i in range(0,len(jointHandles)):
+            vrep.simxSetJointTargetPosition(clientID, jointHandles[i], jointOffsets[i], vrep.simx_opmode_oneshot_wait)
+            vrep.simxSetJointPosition(clientID, jointHandles[i], jointOffsets[i], vrep.simx_opmode_oneshot_wait)
+
+        # Set joints that are not considered by the optimizaton
+        _, rightArm = vrep.simxGetObjectHandle(clientID, 'Joint3', vrep.simx_opmode_oneshot_wait)
+        _, leftArm = vrep.simxGetObjectHandle(clientID, 'Joint4', vrep.simx_opmode_oneshot_wait)
+        vrep.simxSetJointPosition(clientID, rightArm, math.radians(80.0), vrep.simx_opmode_oneshot_wait)
+        vrep.simxSetJointPosition(clientID, leftArm, -math.radians(80.0), vrep.simx_opmode_oneshot_wait)
+
+        # Evaluate for a number of integration steps
         totalDistance = 0
         _, lastPos = vrep.simxGetObjectPosition(clientID, torsoHandle, -1, vrep.simx_opmode_oneshot_wait)
 
-        #set arms into the right initial position
-        vrep.simxSetJointPosition(clientID, rightArmHandle, 1.39, vrep.simx_opmode_oneshot_wait)
-        vrep.simxSetJointPosition(clientID, leftArmHandle, -1.39, vrep.simx_opmode_oneshot_wait)
-        vrep.simxSetJointPosition(clientID, rightShoulderHandle, 1.57, vrep.simx_opmode_oneshot_wait)
-        vrep.simxSetJointPosition(clientID, leftShoulderHandle, 1.57, vrep.simx_opmode_oneshot_wait)
-
-        weightMatrix = bioloid_network.get_random_weights(8,8)
-        bn = bioloid_network.BioloidNetwork(weightMatrix,0.1)
-        for iteration in range(0,1000):
+        bn = bioloid_network.BioloidNetwork(weightMatrix, 0.01)
+        for iteration in range(0,400):
             # CPG network step
-            #output = [-1.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0]
-            #output = bn.get_output()
+            jointAngle = bn.get_output()
 
             # Set joint angles
-            #for i in range(0,len(jointHandles)):
-                vrep.simxSetJointTargetPosition(clientID, jointHandles[i], output[i], vrep.simx_opmode_oneshot)
+            for i in range(0,len(jointHandles)):
+                vrep.simxSetJointTargetPosition(clientID, jointHandles[i], jointOffsets[i] + jointAngle[i], vrep.simx_opmode_oneshot)
 
             # Measure how far the robot moved every 10th (for now) time step
             if iteration % 10 == 0:
@@ -88,4 +94,4 @@ def evaluate_individual():
     print('Done.')
     return totalDistance
 
-evaluate_individual()
+evaluate_individual(bioloid_network.get_random_weights(8,8))
