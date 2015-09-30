@@ -2,14 +2,13 @@ import random
 
 class GenAlg:
 
-    nrIndividualsPerGeneration = 20
+    nrIndividualsPerGeneration = 10 # default
     pTour = 0.75
     pCross = 0.5
     pMut = 0.1
 
     functionClass = None
     generationNr = 0 # when displayed, add 1 (must start from 0 because Python index)
-    individualNr = 0 # when displayed, add 1 (must start from 0 because Python index)
 
     currentFitness = []
     currentGenomes = []
@@ -17,10 +16,11 @@ class GenAlg:
     bestFitness = 0
     bestGenome = []
 
-    def __init__(self, functionClass):
+    def __init__(self, functionClass, nrIndividualsPerGeneration):
         print("Initializing genetic algorithm")
 
         self.functionClass = functionClass
+        self.nrIndividualsPerGeneration = nrIndividualsPerGeneration
 
         for i in range(self.nrIndividualsPerGeneration):
             self.currentFitness.append(0)
@@ -95,56 +95,54 @@ class GenAlg:
 
         return genome
 
-    def onFrame(self):
-        print("Robot is finished")
+    def runGeneration(self):
+        for i in range(nrIndividualsPerGeneration):
+            print("Generation " + (generationNr+1) + ", individual " + (i+1))
 
-        # get robot's score/fitness (by simulating it)
-        currentFitness[individualNr] = functionClass.getFitness(currentGenomes[individualNr])
-        print("Fitness: " + currentFitness[individualNr])
+            # get robot's score/fitness (by simulating it)
+            currentFitness[i] = functionClass.getFitness(currentGenomes[i])
+            print("Robot is finished")
+            print("Fitness: " + currentFitness[i])
 
-        # increase individual count
-        individualNr += 1
+            print("")
 
-        if (individualNr > nrIndividualsPerGeneration):
-            # we are now done with a generation
+        # we are now done with a generation
+        # create a new generation from the previous one
+        newGenomes = []
 
-            # create a new generation from the previous one
-            newGenomes = []
+        # ELITISM HERE
+        bestInGenerationIndex = self.findBestInGenerationIndex(currentFitness)
+        print("Index of best in generation: " + bestInGenerationIndex)
+        print("Genome: " + self.genomeToString(currentGenomes[bestInGenerationIndex]))
+        newGenomes.append(currentGenomes[bestInGenerationIndex])
+        if (currentFitness[bestInGenerationIndex] > bestFitness):
+            # save the globally best genome (over all time)
+            bestFitness = currentFitness[bestInGenerationIndex]
+            bestGenome = currentGenomes[bestInGenerationIndex]
 
-            # ELITISM HERE
-            bestInGenerationIndex = self.findBestInGenerationIndex(currentFitness)
-            print("Index of best in generation: " + bestInGenerationIndex)
-            print("Genome: " + self.genomeToString(currentGenomes[bestInGenerationIndex]))
-            newGenomes.append(currentGenomes[bestInGenerationIndex])
-            if (currentFitness[bestInGenerationIndex] > bestFitness):
-                # save the globally best genome (over all time)
-                bestFitness = currentFitness[bestInGenerationIndex]
-                bestGenome = currentGenomes[bestInGenerationIndex]
+        for i in range(2, nrIndividualsPerGeneration):
+            newGenomes.append([]) # create new position for genome
+            # TOURNAMENT SELECTION
+            winnerGenome = self.tournamentSelection(currentGenomes, currentFitness, pTour)
+            newGenomes[i] = winnerGenome
 
-            for i in range(2, nrIndividualsPerGeneration):
-                newGenomes.append([]) # create new position for genome
-                # TOURNAMENT SELECTION
-                winnerGenome = self.tournamentSelection(currentGenomes, currentFitness, pTour)
-                newGenomes[i] = winnerGenome
+            # CROSSOVER (this version only saves one of the "crossovered" individuals)
+            if (random.random() < pCross):
+                otherGenome = self.tournamentSelection(currentGenomes, currentFitness, pTour)
+                newGenomes[i] = self.crossover(newGenomes[i], otherGenome)
 
-                # CROSSOVER (this version only saves one of the "crossovered" individuals)
-                if (random.random() < pCross):
-                    otherGenome = self.tournamentSelection(currentGenomes, currentFitness, pTour)
-                    newGenomes[i] = self.crossover(newGenomes[i], otherGenome)
+            # MUTATION
+            newGenomes[i] = self.mutate(newGenomes[i], pMut)
 
-                # MUTATION
-                newGenomes[i] = self.mutate(newGenomes[i], pMut)
+        currentGenomes = newGenomes
+        # prints the best genome (assuiming elitism is activated so the best has index 0)
+        print("Best genome this generation: " + self.genomeToString(currentGenomes[0]))
 
-            currentGenomes = newGenomes
-            # prints the best genome (assuiming elitism is activated so the best has index 0)
-            print("Best genome this generation: " + self.genomeToString(currentGenomes[0]))
+        # increase generation count
+        generationNr += 1
 
-            # increase generation count and reset individual count
-            generationNr += 1
-            individualNr = 0
-
+        print("Generation " + generationNr + " done")
         print("")
-        print("Generation " + (generationNr+1) + ", individual " + (individualNr+1))
 
 
     def onCleanup(self):
