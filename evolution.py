@@ -34,9 +34,9 @@ class Individual(AbstractFunctionClass):
 print('Starting evolution...')
 
 myInd = Individual()
-ga = natsel.GenAlg.GenAlg(myInd, 2)
+ga = natsel.GenAlg.GenAlg(myInd, 20)
 
-for generation in range(2):
+for generation in range(20):
     ga.runGeneration()
 
 ga.printResults()
