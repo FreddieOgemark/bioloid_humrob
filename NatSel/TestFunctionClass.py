@@ -28,6 +28,6 @@ class TestFunctionClass(AbstractFunctionClass):
         ranges.append([0.1, 0.7]) # detection distance
         return ranges
 
-    def getFitness(self, robotHandle, genome):
+    def getFitness(self, genome):
         # Should calculate the fitness of the specified genome and return it
         raise NotImplementedError()

@@ -95,11 +95,11 @@ class GenAlg:
 
         return genome
 
-    def onFrame(self, robotHandle):
+    def onFrame(self):
         print("Robot is finished")
 
         # get robot's score/fitness (by simulating it)
-        currentFitness[individualNr] = functionClass.getFitness(robotHandle, currentGenomes[individualNr])
+        currentFitness[individualNr] = functionClass.getFitness(currentGenomes[individualNr])
         print("Fitness: " + currentFitness[individualNr])
 
         # increase individual count

@@ -11,6 +11,6 @@ class AbstractFunctionClass:
         # should return the list [[-2, 3], [3, 5], ...]
         raise NotImplementedError()
 
-    def getFitness(self, robotHandle, genome):
+    def getFitness(self, genome):
         # Should calculate the fitness of the specified genome and return it
         raise NotImplementedError()
