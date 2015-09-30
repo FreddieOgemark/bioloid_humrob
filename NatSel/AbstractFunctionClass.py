@@ -14,12 +14,3 @@ class AbstractFunctionClass:
     def getFitness(self, robotHandle, genome):
         # Should calculate the fitness of the specified genome and return it
         raise NotImplementedError()
-
-    def initializeRobot(self, robotHandle, genome):
-        # Given the specified genome, initialize a new robot instance. Should also 
-        # reset the "isFinished" variable
-        raise NotImplementedError()
-
-    def robotIsFinished(self, robotHandle):
-        # Should return True if the robot is finished (time out or collision or whatever)
-        raise NotImplementedError()

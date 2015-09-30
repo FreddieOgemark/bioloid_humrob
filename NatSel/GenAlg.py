@@ -8,7 +8,6 @@ class GenAlg:
     pMut = 0.1
 
     functionClass = None
-    robotNameID = "unnamed"
     generationNr = 0 # when displayed, add 1 (must start from 0 because Python index)
     individualNr = 0 # when displayed, add 1 (must start from 0 because Python index)
 
@@ -18,10 +17,9 @@ class GenAlg:
     bestFitness = 0
     bestGenome = []
 
-    def __init__(self, robotNameID, functionClass):
+    def __init__(self, functionClass):
         print("Initializing genetic algorithm")
 
-        self.robotNameID = robotNameID
         self.functionClass = functionClass
 
         for i in range(self.nrIndividualsPerGeneration):
@@ -98,18 +96,14 @@ class GenAlg:
         return genome
 
     def onFrame(self, robotHandle):
-        robotIsFinished = functionClass.robotIsFinished(robotHandle)
-        if (robotIsFinished):
-            print("Robot is finished")
+        print("Robot is finished")
 
-            # get robot's score/fitness
-            currentFitness[individualNr] = functionClass.getFitness(robotHandle, currentGenomes[individualNr])
-            print("Fitness: " + currentFitness[individualNr])
+        # get robot's score/fitness (by simulating it)
+        currentFitness[individualNr] = functionClass.getFitness(robotHandle, currentGenomes[individualNr])
+        print("Fitness: " + currentFitness[individualNr])
 
-            # increase individual count
-            individualNr += 1
-        #else:
-            # robot is still running, don't need to do anything
+        # increase individual count
+        individualNr += 1
 
         if (individualNr > nrIndividualsPerGeneration):
             # we are now done with a generation
@@ -149,13 +143,8 @@ class GenAlg:
             generationNr += 1
             individualNr = 0
 
-        if (robotIsFinished):
-            # must now initialise the new individual
-            functionClass.initializeRobot(robotHandle, currentGenomes[individualNr])
-
-            print("")
-            print("Robot was reset")
-            print("Generation " + (generationNr+1) + ", individual " + (individualNr))
+        print("")
+        print("Generation " + (generationNr+1) + ", individual " + (individualNr+1))
 
 
     def onCleanup(self):
