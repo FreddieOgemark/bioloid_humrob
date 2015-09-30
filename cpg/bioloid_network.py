@@ -11,7 +11,7 @@ class BioloidNetwork:
 
     def create_joints(self):
         joint_list = []
-        for i_node in xrange(len(self.neighbours)):
+        for i_node in range(len(self.neighbours)):
             beta = 2.5
             u0 = 1.0
             v1 = 1.0
@@ -34,7 +34,7 @@ class BioloidNetwork:
 
     def get_output(self):
         new_outputs = []
-        for i_node in xrange(len(self.nodes)):
+        for i_node in range(len(self.nodes)):
             current_node = self.nodes[i_node]
             current_neighbours = self.neighbours[i_node]
             input1 = 0
@@ -51,9 +51,9 @@ class BioloidNetwork:
 
 def get_random_weights(a,b):
     weights = []
-    for i in xrange(a):
+    for i in range(a):
         innerWeights = []
-        for j in xrange(b):
+        for j in range(b):
             innerWeights.append(-1+2*random.random())
         weights.append(innerWeights)
     return weights
