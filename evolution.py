@@ -1,18 +1,16 @@
-import cpg.simulation
-import cpg.bioloid_network
-import natsel.AbstractFunctionClass
-import natsel.GenAlg
+from cpg import simulation, bioloid_network
+from natsel import abstract_function_class, gen_alg
 
 import random
 
-class Individual(natsel.AbstractFunctionClass.AbstractFunctionClass):
+class Individual(abstract_function_class.AbstractFunctionClass):
     def initializeGenome(self):
         # Should return a genome, that is, an array/list with floating values
         genome = []
         ranges = self.getGenomeRange()
         for i in range(len(ranges)):
             genome.append(ranges[i][0] + random.random()*(ranges[i][1]-ranges[i][0]))
-        cpg.bioloid_network.get_random_weights(8,8)
+        bioloid_network.get_random_weights(8,8)
         return genome
 
     def getGenomeRange(self):
@@ -27,12 +25,12 @@ class Individual(natsel.AbstractFunctionClass.AbstractFunctionClass):
 
     def getFitness(self, genome):
         # Should calculate the fitness of the specified genome and return it
-        return cpg.simulation.evaluate_individual(genome)
+        return simulation.evaluate_individual(genome)
 
 print('Starting evolution...')
 
 myInd = Individual()
-ga = natsel.GenAlg.GenAlg(myInd, 10)
+ga = gen_alg.GenAlg(myInd, 10)
 
 for generation in range(20):
     ga.runGeneration()
