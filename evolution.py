@@ -5,9 +5,7 @@ import natsel.GenAlg
 
 import random
 
-from natsel.AbstractFunctionClass import AbstractFunctionClass
-
-class Individual(AbstractFunctionClass):
+class Individual(natsel.AbstractFunctionClass.AbstractFunctionClass):
     def initializeGenome(self):
         # Should return a genome, that is, an array/list with floating values
         genome = []
