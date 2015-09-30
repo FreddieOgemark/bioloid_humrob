@@ -5,9 +5,7 @@ import natsel.GenAlg
 
 import random
 
-from natsel.AbstractFunctionClass import AbstractFunctionClass
-
-class Individual(AbstractFunctionClass):
+class Individual(natsel.AbstractFunctionClass.AbstractFunctionClass):
     def initializeGenome(self):
         # Should return a genome, that is, an array/list with floating values
         genome = []
@@ -34,7 +32,7 @@ class Individual(AbstractFunctionClass):
 print('Starting evolution...')
 
 myInd = Individual()
-ga = natsel.GenAlg.GenAlg(myInd, 20)
+ga = natsel.GenAlg.GenAlg(myInd, 10)
 
 for generation in range(20):
     ga.runGeneration()

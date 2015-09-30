@@ -63,7 +63,8 @@ def evaluate_individual(weightMatrix):
         vrep.simxSetJointTargetPosition(clientID, shoulderLeftHandle, -shoulderAngle, vrep.simx_opmode_oneshot_wait)
 
         # Evaluate for a number of integration steps
-        totalDistance = 0
+        position = 0
+        maxPosition = 0
         _, lastPos = vrep.simxGetObjectPosition(clientID, torsoHandle, -1, vrep.simx_opmode_oneshot_wait)
 
         bn = cpg.bioloid_network.BioloidNetwork(weightMatrix, deltaTime)
@@ -97,10 +98,12 @@ def evaluate_individual(weightMatrix):
 
                 # What is the distance along the forward vector?
                 forwardDistance = delta2D[0]*forward2D[0]+delta2D[1]*forward2D[1]
-                totalDistance += forwardDistance
+                position += forwardDistance
+                maxPosition = max(position, maxPosition)
 
         # Measure movement
-        print('Total distance travelled forward: ' + str(totalDistance))
+        print('Last known position: ' + str(position))
+        print('Max position (fitness):' + str(maxPosition))
 
         # Stop simulation
         vrep.simxSynchronous(clientID, False)
@@ -110,6 +113,6 @@ def evaluate_individual(weightMatrix):
         print('Disconnected from VREP.')
 
     print('Done.')
-    return totalDistance
+    return maxPosition
 
 #evaluate_individual(bioloid_network.get_random_weights(8,8))
