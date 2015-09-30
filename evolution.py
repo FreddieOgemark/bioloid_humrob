@@ -32,7 +32,7 @@ print('Starting evolution...')
 myInd = Individual()
 ga = gen_alg.GenAlg(myInd, 10)
 
-for generation in range(20):
+for generation in range(50):
     ga.runGeneration()
 
 ga.printResults()
