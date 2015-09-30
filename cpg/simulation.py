@@ -11,7 +11,7 @@ except:
 
 import time
 import math
-import bioloid_network
+import cpg.bioloid_network
 
 def evaluate_individual(weightMatrix):
     print('Evaluating individual...')
@@ -66,7 +66,7 @@ def evaluate_individual(weightMatrix):
         totalDistance = 0
         _, lastPos = vrep.simxGetObjectPosition(clientID, torsoHandle, -1, vrep.simx_opmode_oneshot_wait)
 
-        bn = bioloid_network.BioloidNetwork(weightMatrix, deltaTime)
+        bn = cpg.bioloid_network.BioloidNetwork(weightMatrix, deltaTime)
         for iteration in range(0,200):
             # CPG network step
             jointAngles = bn.get_output()

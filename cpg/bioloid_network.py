@@ -1,4 +1,4 @@
-import matsuoka_joint
+import cpg.matsuoka_joint
 import random
 
 class BioloidNetwork:
@@ -28,7 +28,7 @@ class BioloidNetwork:
                 tu = tu/2
                 tv = tv/2
                                                         # beta, u0,  v1,  v2,  w21,  w12,  tu, tv, u1,  u2
-            joint_list.append(matsuoka_joint.MatsuokaJoint(beta, u0,  v1,  v2,  w21,  w12,  tu, tv, u1,  u2))
+            joint_list.append(cpg.matsuoka_joint.MatsuokaJoint(beta, u0,  v1,  v2,  w21,  w12,  tu, tv, u1,  u2))
             #joint_list.append(matsuoka_joint.MatsuokaJoint(4*(-1+2*random.random()), 4*(-1+2*random.random()), 4*(-1+2*random.random()), 4*(-1+2*random.random()), 4*(-1+2*random.random()), 4*(-1+2*random.random()), tu, tv, 4*(-1+2*random.random()), 4*(-1+2*random.random())))
         return joint_list
 
