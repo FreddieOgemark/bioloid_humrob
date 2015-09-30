@@ -1,5 +1,12 @@
 import random
 
+def clampValue(value, min, max):
+    if (value < min):
+        value = min
+    elif (value > max):
+        value = max
+    return value
+
 class GenAlg:
 
     nrIndividualsPerGeneration = 10 # default
@@ -24,12 +31,12 @@ class GenAlg:
 
         for i in range(self.nrIndividualsPerGeneration):
             self.currentFitness.append(0)
-            self.currentGenomes.append(functionClass.initializeGenome())
+            self.currentGenomes.append(self.functionClass.initializeGenome())
         print("Initialization done")
 
     def findBestInGenerationIndex(self, populationFitness):
         bestInGenerationIndex = 1
-        for i in range(2, nrIndividualsPerGeneration):
+        for i in range(2, self.nrIndividualsPerGeneration):
             # find best in generation
             if (populationFitness[i] > populationFitness[bestInGenerationIndex]):
                 bestInGenerationIndex = i
@@ -39,22 +46,15 @@ class GenAlg:
     def genomeToString(self, genome):
         output = "("
         for i in range(len(genome)):
-            output = output + genome[i] + ", "
+            output = output + str(genome[i]) + ", "
         output = output[:-2] # remove final ", "
         output = output + ")"
         return output
 
-    def clampValue(value, min, max):
-        if (calue < min):
-            value = min
-        elif (value > max):
-            value = max
-        return value
-
-    def tournamentSelection(population, fitness, probTour):
+    def tournamentSelection(self, population, fitness, probTour):
         winnerGenome = []
-        ind1 = random.randint(0, len(population))
-        ind2 = random.randint(0, len(population))
+        ind1 = random.randint(0, len(population)-1)
+        ind2 = random.randint(0, len(population)-1)
         if (fitness[ind1] > fitness[ind2]):
             betterInd = ind1
             worserInd = ind2
@@ -68,8 +68,8 @@ class GenAlg:
             winnerGenome = list(population[worserInd])
         return winnerGenome
 
-    def crossover(genome1, genome2):
-        crossoverIndex = random.randint(0, len(genome1))
+    def crossover(self, genome1, genome2):
+        crossoverIndex = random.randint(0, len(genome1)-1)
         for i in range(crossoverIndex, len(genome1)):
             # assuming genomes have same length
             tmp = genome1[i]
@@ -82,8 +82,8 @@ class GenAlg:
         else:
             return genome2
 
-    def mutate(genome, probMut):
-        ranges = functionClass.getGenomeRange()
+    def mutate(self, genome, probMut):
+        ranges = self.functionClass.getGenomeRange()
         # for each gene in the genome
         for i in range(len(ranges)):
             if (random.random() < probMut):
@@ -91,18 +91,18 @@ class GenAlg:
                 # mutate
                 genome[i] = genome[i] + (random.random()*change - change/2)
                 # make sure values is within valid ranges
-                genome[i] = self.clampValue(genome[i], ranges[i][0], ranges[i][1])
+                genome[i] = clampValue(genome[i], ranges[i][0], ranges[i][1])
 
         return genome
 
     def runGeneration(self):
-        for i in range(nrIndividualsPerGeneration):
-            print("Generation " + (generationNr+1) + ", individual " + (i+1))
+        for i in range(self.nrIndividualsPerGeneration):
+            print("Generation " + str(self.generationNr+1) + ", individual " + str(i+1))
 
             # get robot's score/fitness (by simulating it)
-            currentFitness[i] = functionClass.getFitness(currentGenomes[i])
+            self.currentFitness[i] = self.functionClass.getFitness(self.currentGenomes[i])
             print("Robot is finished")
-            print("Fitness: " + currentFitness[i])
+            print("Fitness: " + str(self.currentFitness[i]))
 
             print("")
 
@@ -111,45 +111,45 @@ class GenAlg:
         newGenomes = []
 
         # ELITISM HERE
-        bestInGenerationIndex = self.findBestInGenerationIndex(currentFitness)
-        print("Index of best in generation: " + bestInGenerationIndex)
-        print("Genome: " + self.genomeToString(currentGenomes[bestInGenerationIndex]))
-        newGenomes.append(currentGenomes[bestInGenerationIndex])
-        if (currentFitness[bestInGenerationIndex] > bestFitness):
+        bestInGenerationIndex = self.findBestInGenerationIndex(self.currentFitness)
+        print("Index of best in generation: " + str(bestInGenerationIndex))
+        print("Genome: " + self.genomeToString(self.currentGenomes[bestInGenerationIndex]))
+        newGenomes.append(self.currentGenomes[bestInGenerationIndex])
+        if (self.currentFitness[bestInGenerationIndex] > self.bestFitness):
             # save the globally best genome (over all time)
-            bestFitness = currentFitness[bestInGenerationIndex]
-            bestGenome = currentGenomes[bestInGenerationIndex]
+            self.bestFitness = self.currentFitness[bestInGenerationIndex]
+            self.bestGenome = self.currentGenomes[bestInGenerationIndex]
 
-        for i in range(2, nrIndividualsPerGeneration):
+        for i in range(1, self.nrIndividualsPerGeneration):
             newGenomes.append([]) # create new position for genome
             # TOURNAMENT SELECTION
-            winnerGenome = self.tournamentSelection(currentGenomes, currentFitness, pTour)
+            winnerGenome = self.tournamentSelection(self.currentGenomes, self.currentFitness, self.pTour)
             newGenomes[i] = winnerGenome
 
             # CROSSOVER (this version only saves one of the "crossovered" individuals)
-            if (random.random() < pCross):
-                otherGenome = self.tournamentSelection(currentGenomes, currentFitness, pTour)
+            if (random.random() < self.pCross):
+                otherGenome = self.tournamentSelection(self.currentGenomes, self.currentFitness, self.pTour)
                 newGenomes[i] = self.crossover(newGenomes[i], otherGenome)
 
             # MUTATION
-            newGenomes[i] = self.mutate(newGenomes[i], pMut)
+            newGenomes[i] = self.mutate(newGenomes[i], self.pMut)
 
-        currentGenomes = newGenomes
+        self.currentGenomes = newGenomes
         # prints the best genome (assuiming elitism is activated so the best has index 0)
-        print("Best genome this generation: " + self.genomeToString(currentGenomes[0]))
+        print("Best genome this generation: " + self.genomeToString(self.currentGenomes[0]))
 
         # increase generation count
-        generationNr += 1
+        self.generationNr += 1
 
-        print("Generation " + generationNr + " done")
+        print("Generation " + str(self.generationNr) + " done")
         print("")
 
 
-    def onCleanup(self):
+    def printResults(self):
         print("")
         print("Time for cleanup")
         # Print info or save to file or something
         print("Best genome during the whole simulation:")
-        print(self.genomeToString(bestGenome))
-        print("Fitness of best genome: " + bestFitness)
+        print(self.genomeToString(self.bestGenome))
+        print("Fitness of best genome: " + str(self.bestFitness))
 

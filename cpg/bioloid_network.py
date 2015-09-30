@@ -2,8 +2,8 @@ import matsuoka_joint
 import random
 
 class BioloidNetwork:
-    def __init__(self, weights, timestep):
-        self.weights = weights
+    def __init__(self, weightList, timestep):
+        self.weights = get_weights_from_list(weightList, 8, 8)
         self.neighbours = [[1,2,5],[0,2,4],[0,1,3,6,7],[2,4,5,6,7],[1,3,5],[0,3,4],[2,3,7],[2,3,6]]
         self.nodes = self.create_joints()
         self.last_outputs = [1,1,1,1,1,1,1,1]
@@ -18,7 +18,7 @@ class BioloidNetwork:
             v2 = 0.0
             w21 = -2.0
             w12 = -2.0
-            tu = 0.125
+            tu = 0.025
             tv = 0.3
             u1 = 0.0
             u2 = 1.0
@@ -57,3 +57,15 @@ def get_random_weights(a,b):
             innerWeights.append(-1+2*random.random())
         weights.append(innerWeights)
     return weights
+
+def get_weights_from_list(l,w,h):
+    weights = []
+    index = 0
+    for i in range(h):
+        row = []
+        for j in range(w):
+            row.append(l[index])
+            index += 1
+        weights.append(row)
+    return weights
+

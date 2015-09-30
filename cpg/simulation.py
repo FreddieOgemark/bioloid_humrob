@@ -47,6 +47,9 @@ def evaluate_individual(weightMatrix):
         vrep.simxSynchronous(clientID, True)
         print('Sim started.')
 
+        # Speed up simulation
+        vrep.simxSetIntegerParameter(clientID, vrep.sim_intparam_speedmodifier, 10, vrep.simx_opmode_oneshot_wait)
+
         # Set initial joint angles
         for i in range(0,len(jointHandles)):
             vrep.simxSetJointPosition(clientID, jointHandles[i], jointOffsets[i], vrep.simx_opmode_oneshot_wait)
@@ -97,7 +100,7 @@ def evaluate_individual(weightMatrix):
                 totalDistance += forwardDistance
 
         # Measure movement
-        print('Total distance travelled (in any direction): ' + str(totalDistance))
+        print('Total distance travelled forward: ' + str(totalDistance))
 
         # Stop simulation
         vrep.simxSynchronous(clientID, False)
@@ -109,4 +112,4 @@ def evaluate_individual(weightMatrix):
     print('Done.')
     return totalDistance
 
-evaluate_individual(bioloid_network.get_random_weights(8,8))
+#evaluate_individual(bioloid_network.get_random_weights(8,8))
