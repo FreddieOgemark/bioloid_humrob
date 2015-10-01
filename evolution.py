@@ -21,7 +21,7 @@ class Individual(abstract_function_class.AbstractFunctionClass):
         # should return the list [[-2, 3], [3, 5], ...]
         ranges = []
         for i in range(8*8):
-            ranges.append([-1.0, 1.0])
+            ranges.append([-2.0, 2.0])
         return ranges
 
     def getFitness(self, genome):
@@ -32,15 +32,16 @@ print('Starting evolution...')
 
 start_time = time.time()
 
-populationSize = 5
-generations = 25
+populationSize = 15
+generations = 100
 
 myInd = Individual()
 ga = gen_alg.GenAlg(myInd, populationSize)
 
 for generation in range(generations):
     ga.runGeneration()
+    print("\n--- GA has currently run for " + str(time.time()-start_time) + " seconds ---")
 
 ga.printResults()
 
-print("\n--- Execution time: " + str(time.time()-start_time) + " seconds ---")
+print("\n--- Total execution time: " + str(time.time()-start_time) + " seconds ---")

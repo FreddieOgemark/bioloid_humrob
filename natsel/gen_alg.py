@@ -12,7 +12,7 @@ class GenAlg:
     nrIndividualsPerGeneration = 10 # default
     pTour = 0.75
     pCross = 0.5
-    pMut = 0.1
+    pMut = 0.1 # currently overwritten in constructor to 1/genomeLength
 
     functionClass = None
     generationNr = 0 # when displayed, add 1 (must start from 0 because Python index)
@@ -32,6 +32,8 @@ class GenAlg:
         for i in range(self.nrIndividualsPerGeneration):
             self.currentFitness.append(0)
             self.currentGenomes.append(self.functionClass.initializeGenome())
+        self.pMut = 1/len(self.currentGenomes[0])
+        print("pMut set to " + str(self.pMut))
         print("Initialization done")
 
     def findBestInGenerationIndex(self, populationFitness):
@@ -89,7 +91,12 @@ class GenAlg:
             if (random.random() < probMut):
                 change = (ranges[i][1] - ranges[i][0])*0.1 # max 10 % of total range interval
                 # mutate
-                genome[i] = genome[i] + (random.random()*change - change/2)
+                if (random.random() < 0.7):
+                    # creep mutation
+                    genome[i] = genome[i] + (random.random()*change - change/2)
+                else:
+                    # random mutation
+                    genome[i] = ranges[i][0] + random.random()*(ranges[i][1]-ranges[i][0])
                 # make sure values is within valid ranges
                 genome[i] = clampValue(genome[i], ranges[i][0], ranges[i][1])
 
@@ -136,7 +143,8 @@ class GenAlg:
 
         self.currentGenomes = newGenomes
         # prints the best genome (assuiming elitism is activated so the best has index 0)
-        print("Best genome this generation: " + self.genomeToString(self.currentGenomes[0]))
+        #print("Best genome this generation: " + self.genomeToString(self.currentGenomes[0]))
+        print("Current best genome fitness: " + str(self.bestFitness))
 
         # increase generation count
         self.generationNr += 1
