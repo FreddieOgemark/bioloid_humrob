@@ -2,6 +2,7 @@ from cpg import simulation, bioloid_network
 from natsel import abstract_function_class, gen_alg
 
 import random
+import time
 
 class Individual(abstract_function_class.AbstractFunctionClass):
     def initializeGenome(self):
@@ -29,6 +30,8 @@ class Individual(abstract_function_class.AbstractFunctionClass):
 
 print('Starting evolution...')
 
+start_time = time.time()
+
 populationSize = 5
 generations = 25
 
@@ -39,3 +42,5 @@ for generation in range(generations):
     ga.runGeneration()
 
 ga.printResults()
+
+print("\n--- Execution time: " + str(time.time()-start_time) + " seconds ---")
