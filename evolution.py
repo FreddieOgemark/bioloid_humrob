@@ -29,10 +29,13 @@ class Individual(abstract_function_class.AbstractFunctionClass):
 
 print('Starting evolution...')
 
-myInd = Individual()
-ga = gen_alg.GenAlg(myInd, 10)
+populationSize = 5
+generations = 25
 
-for generation in range(50):
+myInd = Individual()
+ga = gen_alg.GenAlg(myInd, populationSize)
+
+for generation in range(generations):
     ga.runGeneration()
 
 ga.printResults()
