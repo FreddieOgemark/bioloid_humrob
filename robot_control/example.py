@@ -45,6 +45,6 @@ def move():
     for s in servos:
         s.disable_torque()
 
-move()
+#move()
 
 print('Done.')
