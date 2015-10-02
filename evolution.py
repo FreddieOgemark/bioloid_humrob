@@ -3,6 +3,7 @@ from natsel import abstract_function_class, gen_alg
 
 import random
 import time
+import sys
 
 class Individual(abstract_function_class.AbstractFunctionClass):
     def initializeGenome(self):
@@ -21,22 +22,28 @@ class Individual(abstract_function_class.AbstractFunctionClass):
         # should return the list [[-2, 3], [3, 5], ...]
         ranges = []
         for i in range(8*8):
-            ranges.append([-2.0, 2.0])
+            ranges.append([-1.5, 1.5])
         return ranges
 
     def getFitness(self, genome):
         # Should calculate the fitness of the specified genome and return it
         return simulation.evaluate_individual(genome)
 
+initPopFilename = None
+if (len(sys.argv) == 2):
+    # assuming the second parameter is name of file containing the initial population
+    initPopFilename = sys.argv[1]
+    print("File containing initial population:", initPopFilename)
+
 print('Starting evolution...')
 
 start_time = time.time()
 
-populationSize = 15
-generations = 100
+populationSize = 5
+generations = 2
 
 myInd = Individual()
-ga = gen_alg.GenAlg(myInd, populationSize)
+ga = gen_alg.GenAlg(myInd, populationSize, initPopFilename)
 
 for generation in range(generations):
     ga.runGeneration()

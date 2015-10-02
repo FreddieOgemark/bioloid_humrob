@@ -1,4 +1,6 @@
 import random
+import datetime
+import os
 
 def clampValue(value, min, max):
     if (value < min):
@@ -23,18 +25,67 @@ class GenAlg:
     bestFitness = 0
     bestGenome = []
 
-    def __init__(self, functionClass, nrIndividualsPerGeneration):
+    def __init__(self, functionClass, nrIndividualsPerGeneration, initPopFilename):
         print("Initializing genetic algorithm")
 
         self.functionClass = functionClass
         self.nrIndividualsPerGeneration = nrIndividualsPerGeneration
-
-        for i in range(self.nrIndividualsPerGeneration):
-            self.currentFitness.append(0)
-            self.currentGenomes.append(self.functionClass.initializeGenome())
-        self.pMut = 1/len(self.currentGenomes[0])
+        genomeLength = len(self.functionClass.getGenomeRange())
+        self.pMut = 1/genomeLength
         print("pMut set to " + str(self.pMut))
+
+        successReadingInitPop = False
+        if ((not (initPopFilename is None)) and os.path.exists(initPopFilename)):
+            # primarily use the initial population
+            initPop = self.readInitialPopFile(initPopFilename, genomeLength)
+            if not (initPop is None):
+                # managed to load an initial population, there are now three cases
+                # initPop.length < nrIndividualsPerGeneration: fill up remainder with mutated
+                if (len(initPop) < nrIndividualsPerGeneration):
+                    for i in range(nrIndividualsPerGeneration):
+                        if (i < len(initPop)):
+                            self.currentGenomes.append(initPop[i])
+                        else:
+                            rndIndex = random.randint(0, len(initPop)-1)
+                            self.currentGenomes.append(self.mutate(initPop[rndIndex], self.pMut))
+                # initPop.length > nrIndividualsPerGeneration: only pick first ones
+                else:# (len(initPop) > nrIndividualsPerGeneration):
+                    for i in range(nrIndividualsPerGeneration):
+                        self.currentGenomes.append(initPop[i])
+                # initPop.length == nrIndividualsPerGeneration: pick it as is
+                    # same as the previous one
+                successReadingInitPop = True
+
+        # if we failed to read init pop, initialize randomly instead
+        if not successReadingInitPop:
+            print("Failed reading init pop file, initializing from scratch instead")
+            # create entirely new population
+            for i in range(self.nrIndividualsPerGeneration):
+                self.currentGenomes.append(self.functionClass.initializeGenome())
+        # init fitness
+        for i in range(self.nrIndividualsPerGeneration):
+                self.currentFitness.append(0)
         print("Initialization done")
+
+    def readInitialPopFile(self, initPopFilename, expectedGenomeLength):
+        # can assume that initPopFilename is not None and the file exists
+        f = open(initPopFilename)
+        population = []
+        allLines = list(f)
+        for k in range(len(allLines)):
+            # each line is a genome
+            genome = []
+            line = allLines[k]
+            valueStrings = line.split(",")
+            if (len(valueStrings) != expectedGenomeLength):
+                # Can't read genome since it has wrong length!
+                print("ERROR: Genome in initial population had length", len(valueStrings), "while the expected genome length was", expectedGenomeLength)
+                return None
+            for i in range(len(valueStrings)):
+                genome.append(float(valueStrings[i]))
+            population.append(genome)
+        return population
+
 
     def findBestInGenerationIndex(self, populationFitness):
         bestInGenerationIndex = 1
@@ -160,4 +211,35 @@ class GenAlg:
         print("Best genome during the whole simulation:")
         print(self.genomeToString(self.bestGenome))
         print("Fitness of best genome: " + str(self.bestFitness))
+
+
+        print("Writing best genome and current population to file")
+        dataFolder = "genomeData/"
+        if not os.path.exists(dataFolder):
+            os.makedirs(dataFolder)
+        timestamp = datetime.datetime.today()
+        timestampString = timestamp.strftime('%Y-%m-%d_%H-%M-%S')
+
+        genomeFileName = "bestGenome"
+        genomeFile = open(dataFolder + timestampString + "_" + genomeFileName + ".csv", 'w')
+        line = ""
+        for i in range(len(self.bestGenome)):
+            line = line + str(self.bestGenome[i]) + ","
+        line = line[:-1] + "\n"
+        genomeFile.write(line)
+        genomeFile.close()
+        print("Best genome should be written to file")
+
+        populationFileName = "population"
+        populationFile = open(dataFolder + timestampString + "_" + populationFileName + ".csv", 'w')
+        outputText = ""
+        for k in range(len(self.currentGenomes)):
+            line = ""
+            for i in range(len(self.currentGenomes[k])):
+                line = line + str(self.currentGenomes[k][i]) + ","
+            line = line[:-1] + "\n"
+            outputText = outputText + line
+        populationFile.write(outputText)
+        populationFile.close()
+        print("Population should be written to file")
 
