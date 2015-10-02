@@ -25,12 +25,14 @@ def evaluate_individual(weightMatrix):
 
         # Shoulders should point downwards by default!
         jointIndices = [15,13,9,12,14,16,1,2]
-        jointOffsets = [0.0,0.0,0.0,0.0,0.0,0.0,-math.radians(90.0),-math.radians(90.0)]
+        jointOffsets = [0.0,0.0,0.0,0.0,0.0,0.0,-math.radians(90.0),math.radians(90.0)]
 
         # Get handles
         _, pivotHandle = vrep.simxGetObjectHandle(clientID, 'Pivot', vrep.simx_opmode_oneshot_wait)
         _, shoulderRightHandle = vrep.simxGetObjectHandle(clientID, 'Joint3', vrep.simx_opmode_oneshot_wait)
         _, shoulderLeftHandle = vrep.simxGetObjectHandle(clientID, 'Joint4', vrep.simx_opmode_oneshot_wait)
+        _, hipRightHandle = vrep.simxGetObjectHandle(clientID, 'Joint7', vrep.simx_opmode_oneshot_wait)
+        _, hipLeftHandle = vrep.simxGetObjectHandle(clientID, 'Joint8', vrep.simx_opmode_oneshot_wait)
 
         jointHandles = []
         for i in jointIndices:
@@ -61,6 +63,12 @@ def evaluate_individual(weightMatrix):
         vrep.simxSetJointTargetPosition(clientID, shoulderRightHandle, shoulderAngle, vrep.simx_opmode_oneshot_wait)
         vrep.simxSetJointPosition(clientID, shoulderLeftHandle, -shoulderAngle, vrep.simx_opmode_oneshot_wait)
         vrep.simxSetJointTargetPosition(clientID, shoulderLeftHandle, -shoulderAngle, vrep.simx_opmode_oneshot_wait)
+
+        hipAngle = math.radians(45.0)
+        vrep.simxSetJointPosition(clientID, hipRightHandle, -hipAngle, vrep.simx_opmode_oneshot_wait)
+        vrep.simxSetJointTargetPosition(clientID, hipRightHandle, -hipAngle, vrep.simx_opmode_oneshot_wait)
+        vrep.simxSetJointPosition(clientID, hipLeftHandle, hipAngle, vrep.simx_opmode_oneshot_wait)
+        vrep.simxSetJointTargetPosition(clientID, hipLeftHandle, hipAngle, vrep.simx_opmode_oneshot_wait)
 
         # Evaluate for a number of integration steps
         position = 0
