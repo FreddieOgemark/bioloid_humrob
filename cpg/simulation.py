@@ -68,7 +68,7 @@ def evaluate_individual(weightMatrix):
         _, lastPos = vrep.simxGetObjectPosition(clientID, torsoHandle, -1, vrep.simx_opmode_oneshot_wait)
 
         bn = cpg.bioloid_network.BioloidNetwork(weightMatrix, deltaTime)
-        for iteration in range(0,200):
+        for iteration in range(0,400):
             # CPG network step
             jointAngles = bn.get_output()
 
