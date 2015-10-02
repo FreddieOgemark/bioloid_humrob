@@ -6,9 +6,12 @@ import math
 import cpg.bioloid_network
 from robot_control.lib_robotis import *
 from robot_control.usbscan import *
+import file_Operation
 
 
-def evaluate_individual(genome):
+def evaluate_individual(genomeFileName):
+    f = fileOperations(genomeFileName)
+    genome = f.showContent()
     bioloid = bioloid_control.BioloidControl();
 
     if bioloid.devName:
@@ -88,4 +91,4 @@ class Bioloid:
             servos[i].move_angle(self.servoAngle[i], vel, True) # True here means block call until movement done
 
 
-#evaluate_individual(bioloid_network.get_random_weights(8,8))
+#evaluate_individual('2015-10-02_13-41-35_bestGenome.csv')

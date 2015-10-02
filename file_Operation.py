@@ -20,6 +20,6 @@ class fileOperations:
         return self.parameterValues
 
 
-f = fileOperations('2015-10-02_13-41-35_bestGenome.csv')
-content = f.showContent()
-print(content)
+#f = fileOperations('2015-10-02_13-41-35_bestGenome.csv')
+#content = f.showContent()
+#print(content)
