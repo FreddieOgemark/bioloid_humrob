@@ -1,4 +1,6 @@
 import random
+import datetime
+import os
 
 def clampValue(value, min, max):
     if (value < min):
@@ -160,4 +162,34 @@ class GenAlg:
         print("Best genome during the whole simulation:")
         print(self.genomeToString(self.bestGenome))
         print("Fitness of best genome: " + str(self.bestFitness))
+
+        print("Writing best genome and current population to file")
+        dataFolder = "genomeData/"
+        if not os.path.exists(dataFolder):
+            os.makedirs(dataFolder)
+        timestamp = datetime.datetime.today()
+        timestampString = timestamp.strftime('%Y-%m-%d_%H-%M-%S')
+
+        genomeFileName = "bestGenome"
+        genomeFile = open(dataFolder + timestampString + "_" + genomeFileName + ".csv", 'w')
+        line = ""
+        for i in range(len(self.bestGenome)):
+            line = line + str(self.bestGenome[i]) + ","
+        line = line[:-1] + "\n"
+        genomeFile.write(line)
+        genomeFile.close()
+        print("Best genome should be written to file")
+
+        populationFileName = "population"
+        populationFile = open(dataFolder + timestampString + "_" + populationFileName + ".csv", 'w')
+        outputText = ""
+        for k in range(len(self.currentGenomes)):
+            line = ""
+            for i in range(len(self.currentGenomes[k])):
+                line = line + str(self.currentGenomes[k][i]) + ","
+            line = line[:-1] + "\n"
+            outputText = outputText + line
+        populationFile.write(outputText)
+        populationFile.close()
+        print("Population should be written to file")
 
