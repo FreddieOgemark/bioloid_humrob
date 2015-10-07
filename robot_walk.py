@@ -1,5 +1,5 @@
-from lib_robotis import *
-from usbscan import *
+#from lib_robotis import *
+#from usbscan import *
 
 import time
 import math
@@ -87,7 +87,7 @@ class Bioloid:
     def move(self):
         vel = math.radians(100.0)
         # Base-pose:
-        for i in range(len(self.servos))
+        for i in range(len(self.servos)):
             servos[i].move_angle(self.servoAngle[i], vel, True) # True here means block call until movement done
 
 
