@@ -8,7 +8,8 @@ class fileOperations:
         #fileName = "2015-10-02_13-41-35_bestGenome.csv"
         self.lines = []
         self.parameterValues = []
-        with open(fileName) as f:
+        #with open(fileName) as f:
+        with open(os.path.join(folderName, fileName)) as f:
             self.lines = self.lines + f.readlines()
             
 
@@ -47,9 +48,9 @@ class fileOperations:
         return lastFile
                         
 
-#f = fileOperations("D:\Alireza_UniDocuments\Chalmers University\Semester 3\Humanoid Robotics\Git\TIF160_Bioloid")
+f = fileOperations("D:\Alireza_UniDocuments\Chalmers University\Semester 3\Humanoid Robotics\Git\TIF160_Bioloid\walkingPatterns")
 
 #content = f.showContent()
 #print(content)
 
-#print f.getContent()
+print f.getContent()
