@@ -1,4 +1,4 @@
-class fileOperations:
+class FileOperations:
 
     def __init__(self, fileName):
         
@@ -20,6 +20,6 @@ class fileOperations:
         return self.parameterValues
 
 
-#f = fileOperations('2015-10-02_13-41-35_bestGenome.csv')
+#f = FileOperations('genomeData/2015-10-02_15-51-12_bestGenome.csv')
 #content = f.showContent()
 #print(content)
