@@ -140,8 +140,5 @@ class Bioloid:
             servos[i].move_angle(self.servoAngle[i], vel, True) # True here means block call until movement done
 
 
-<<<<<<< HEAD
 evaluate_individual('walkingPatterns/2015-10-03_bestGenome_nofalling.csv')
-=======
-#evaluate_individual('2015-10-02_13-41-35_bestGenome.csv')
->>>>>>> 65111c59d051e9a955d2c24f12549bab95a3fdd0
+
