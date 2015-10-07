@@ -15,53 +15,15 @@ import cpg.bioloid_network
 
 clientID = -1
 
-deltaTime = 0.01
-# Shoulders should point downwards by default!
-jointIndices = [15,13,9,12,14,16,1,2] #declared outside of function!
-jointOffsets = [0.0,0.0,0.0,0.0,0.0,0.0,-math.radians(90.0),math.radians(90.0)]
-
-# joint and robot handles
-pivotHandle = -1
-shoulderRightHandle = -1
-shoulderLeftHandle = -1
-hipRightHandle = -1
-hipLeftHandle = -1
-jointHandles = []
-torsoHandle = -1
-
 def connect_to_vrep():
     global clientID
-    global pivotHandle
-    global shoulderRightHandle
-    global shoulderLeftHandle
-    global hipRightHandle
-    global hipLeftHandle
-    global jointHandles
-    global torsoHandle
-
     clientID = vrep.simxStart('127.0.0.1', 19997, True, True, 1000, 5)
     if clientID == -1:
         print('Failed to connect to VREP.')
     else:
         print('Connected to VREP.')
-    # Get handles
-    _, pivotHandle = vrep.simxGetObjectHandle(clientID, 'Pivot', vrep.simx_opmode_oneshot_wait)
-    _, shoulderRightHandle = vrep.simxGetObjectHandle(clientID, 'Joint3', vrep.simx_opmode_oneshot_wait)
-    _, shoulderLeftHandle = vrep.simxGetObjectHandle(clientID, 'Joint4', vrep.simx_opmode_oneshot_wait)
-    _, hipRightHandle = vrep.simxGetObjectHandle(clientID, 'Joint7', vrep.simx_opmode_oneshot_wait)
-    _, hipLeftHandle = vrep.simxGetObjectHandle(clientID, 'Joint8', vrep.simx_opmode_oneshot_wait)
-
-    jointHandles = []
-    for i in jointIndices:
-        _, h = vrep.simxGetObjectHandle(clientID, 'Joint' + str(i), vrep.simx_opmode_oneshot_wait)
-        jointHandles.append(h)
-    _, torsoHandle = vrep.simxGetObjectHandle(clientID, 'Bioloid', vrep.simx_opmode_oneshot_wait)
-    print('Object handles received.')
-    vrep.simxSynchronous(clientID, True)
-
 
 def disconnect_from_vrep():
-    vrep.simxSynchronous(clientID, False)
     vrep.simxFinish(clientID)
     print('Disconnected from VREP.')
 
@@ -72,26 +34,33 @@ def evaluate_individual(weightMatrix):
         # This means that the instance was not initialised! 
         raise ValueError("The V-REP instance was not initialised!")
     else:
+        deltaTime = 0.01
+
+        # Shoulders should point downwards by default!
+        jointIndices = [15,13,9,12,14,16,1,2]
+        jointOffsets = [0.0,0.0,0.0,0.0,0.0,0.0,-math.radians(90.0),math.radians(90.0)]
+
         # Get handles
-        #_, pivotHandle = vrep.simxGetObjectHandle(clientID, 'Pivot', vrep.simx_opmode_oneshot_wait)
-        #_, shoulderRightHandle = vrep.simxGetObjectHandle(clientID, 'Joint3', vrep.simx_opmode_oneshot_wait)
-        #_, shoulderLeftHandle = vrep.simxGetObjectHandle(clientID, 'Joint4', vrep.simx_opmode_oneshot_wait)
-        #_, hipRightHandle = vrep.simxGetObjectHandle(clientID, 'Joint7', vrep.simx_opmode_oneshot_wait)
-        #_, hipLeftHandle = vrep.simxGetObjectHandle(clientID, 'Joint8', vrep.simx_opmode_oneshot_wait)
+        _, pivotHandle = vrep.simxGetObjectHandle(clientID, 'Pivot', vrep.simx_opmode_oneshot_wait)
+        _, shoulderRightHandle = vrep.simxGetObjectHandle(clientID, 'Joint3', vrep.simx_opmode_oneshot_wait)
+        _, shoulderLeftHandle = vrep.simxGetObjectHandle(clientID, 'Joint4', vrep.simx_opmode_oneshot_wait)
+        _, hipRightHandle = vrep.simxGetObjectHandle(clientID, 'Joint7', vrep.simx_opmode_oneshot_wait)
+        _, hipLeftHandle = vrep.simxGetObjectHandle(clientID, 'Joint8', vrep.simx_opmode_oneshot_wait)
 
-        #jointHandles = []
-        #for i in jointIndices:
-        #    _, h = vrep.simxGetObjectHandle(clientID, 'Joint' + str(i), vrep.simx_opmode_oneshot_wait)
-        #    jointHandles.append(h)
+        jointHandles = []
+        for i in jointIndices:
+            _, h = vrep.simxGetObjectHandle(clientID, 'Joint' + str(i), vrep.simx_opmode_oneshot_wait)
+            jointHandles.append(h)
 
-        #print('Object handles received.')
+        print('Object handles received.')
 
         # Get bioloid handle
-        #_, torsoHandle = vrep.simxGetObjectHandle(clientID, 'Bioloid', vrep.simx_opmode_oneshot_wait)
+        _, torsoHandle = vrep.simxGetObjectHandle(clientID, 'Bioloid', vrep.simx_opmode_oneshot_wait)
 
         # Start simulation
         vrep.simxStartSimulation(clientID, vrep.simx_opmode_oneshot)
-        print('Sim started. clientID: ' + str(clientID))
+        vrep.simxSynchronous(clientID, True)
+        print('Sim started.')
 
         # Speed up simulation
         vrep.simxSetIntegerParameter(clientID, vrep.sim_intparam_speedmodifier, 10, vrep.simx_opmode_oneshot_wait)
@@ -158,6 +127,7 @@ def evaluate_individual(weightMatrix):
         print('Max position (fitness):' + str(maxPosition))
 
         # Stop simulation
+        vrep.simxSynchronous(clientID, False)
         vrep.simxStopSimulation(clientID, vrep.simx_opmode_oneshot_wait)
         print('Sim stopped.')
         
