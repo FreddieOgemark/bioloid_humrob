@@ -140,7 +140,7 @@ class GenAlg:
         # for each gene in the genome
         for i in range(len(ranges)):
             if (random.random() < probMut):
-                change = (ranges[i][1] - ranges[i][0])*0.05 # max 10 % of total range interval
+                change = (ranges[i][1] - ranges[i][0])*0.1 # max 10 % of total range interval
                 # mutate
                 if (random.random() < 0.7):
                     # creep mutation
