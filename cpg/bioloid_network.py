@@ -45,9 +45,9 @@ class BioloidNetwork:
             input1 = 0
             input2 = 0
             for i_neighbour in current_neighbours:
-                input1 += self.last_outputs[i_neighbour]*self.weights[i_node][i_neighbour] 
-                #input1 += max(self.last_outputs[i_neighbour],0)*self.weights[i_node][i_neighbour] 
-                #input2 += min(self.last_outputs[i_neighbour],0)*self.weights[i_node][i_neighbour] 
+                #input1 += self.last_outputs[i_neighbour]*self.weights[i_node][i_neighbour] 
+                input1 += max(self.last_outputs[i_neighbour],0)*self.weights[i_node][i_neighbour] 
+                input2 += min(self.last_outputs[i_neighbour],0)*self.weights[i_node][i_neighbour] 
             new_outputs.append(self.nodes[i_node].get_output(input1,input2,self.timestep))
         #print(new_outputs)
         self.last_outputs = new_outputs
