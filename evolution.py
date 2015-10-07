@@ -22,7 +22,7 @@ class Individual(abstract_function_class.AbstractFunctionClass):
         # should return the list [[-2, 3], [3, 5], ...]
         ranges = []
         for i in range(8*8):
-            ranges.append([-1.5, 1.5])
+            ranges.append([-2.0, 2.0])
         return ranges
 
     def getFitness(self, genome):
@@ -35,14 +35,12 @@ if (len(sys.argv) == 2):
     initPopFilename = sys.argv[1]
     print("File containing initial population:", initPopFilename)
 
-simulation.connect_to_vrep()
-
 print('Starting evolution...')
 
 start_time = time.time()
 
-populationSize = 10
-generations = 5
+populationSize = 20
+generations = 20
 
 myInd = Individual()
 ga = gen_alg.GenAlg(myInd, populationSize, initPopFilename)
@@ -52,7 +50,5 @@ for generation in range(generations):
     print("\n--- GA has currently run for " + str(time.time()-start_time) + " seconds ---")
 
 ga.printResults()
-
-simulation.disconnect_from_vrep()
 
 print("\n--- Total execution time: " + str(time.time()-start_time) + " seconds ---")
