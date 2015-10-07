@@ -3,7 +3,11 @@ import random
 
 class BioloidNetwork:
     def __init__(self, weightList, timestep):
-        self.weights = get_weights_from_list(weightList, 8, 8)
+        # we assume that the first 8*8 values in the weight list are weights for the network
+        # and the rest are parameters for the cpg
+        if len(weightList) != (8*8+12):
+            print("Weight list was not of expected length!")
+        self.weights = get_weights_from_list(weightList[0:(8*8)], 8, 8)
         self.neighbours = [[1,2,5],[0,2,4],[0,1,3,6,7],[2,4,5,6,7],[1,3,5],[0,3,4],[2,3,7],[2,3,6]]
         self.nodes = self.create_joints()
         self.last_outputs = [1,1,1,1,1,1,1,1]

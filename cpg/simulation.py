@@ -13,14 +13,27 @@ import time
 import math
 import cpg.bioloid_network
 
+clientID = -1
+
+def connect_to_vrep():
+    global clientID
+    clientID = vrep.simxStart('127.0.0.1', 19997, True, True, 1000, 5)
+    if clientID == -1:
+        print('Failed to connect to VREP.')
+    else:
+        print('Connected to VREP.')
+
+def disconnect_from_vrep():
+    vrep.simxFinish(clientID)
+    print('Disconnected from VREP.')
+
 def evaluate_individual(weightMatrix):
     print('Evaluating individual...')
 
-    vrep.simxFinish(-1)
-    clientID = vrep.simxStart('127.0.0.1', 19997, True, True, 1000, 5)
-    print('Connected to VREP.')
-
-    if clientID != -1:
+    if clientID == -1:
+        # This means that the instance was not initialised! 
+        raise ValueError("The V-REP instance was not initialised!")
+    else:
         deltaTime = 0.01
 
         # Shoulders should point downwards by default!
@@ -117,8 +130,7 @@ def evaluate_individual(weightMatrix):
         vrep.simxSynchronous(clientID, False)
         vrep.simxStopSimulation(clientID, vrep.simx_opmode_oneshot_wait)
         print('Sim stopped.')
-        vrep.simxFinish(clientID)
-        print('Disconnected from VREP.')
+        
 
     print('Done.')
     return maxPosition
