@@ -57,7 +57,7 @@ class BioloidControl:
 
 def evaluate_individual(genomeFileName):
     f = fileOperations(genomeFileName)
-    genome = f.showContent()
+    genome = f.getContent()
     bioloid = BioloidControl('/dev/ttyUSB0');
 
     if bioloid.devName:
@@ -140,5 +140,6 @@ class Bioloid:
             servos[i].move_angle(self.servoAngle[i], vel, True) # True here means block call until movement done
 
 
-evaluate_individual('walkingPatterns/2015-10-03_bestGenome_nofalling.csv')
+#evaluate_individual('walkingPatterns/2015-10-03_bestGenome_nofalling.csv')
+evaluate_individual('walkingPatterns')
 

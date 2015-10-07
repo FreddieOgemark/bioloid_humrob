@@ -48,9 +48,10 @@ class fileOperations:
         return lastFile
                         
 
-f = fileOperations("D:\Alireza_UniDocuments\Chalmers University\Semester 3\Humanoid Robotics\Git\TIF160_Bioloid\walkingPatterns")
+#f = fileOperations("D:\Alireza_UniDocuments\Chalmers University\Semester 3\Humanoid Robotics\Git\TIF160_Bioloid\walkingPatterns")
+#f = fileOperations("walkingPatterns")
 
 #content = f.showContent()
 #print(content)
 
-print f.getContent()
+#print f.getContent()
