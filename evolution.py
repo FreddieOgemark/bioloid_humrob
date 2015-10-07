@@ -12,7 +12,17 @@ class Individual(abstract_function_class.AbstractFunctionClass):
         ranges = self.getGenomeRange()
         for i in range(len(ranges)):
             genome.append(ranges[i][0] + random.random()*(ranges[i][1]-ranges[i][0]))
-        bioloid_network.get_random_weights(8,8)
+        #bioloid_network.get_random_weights(8,8)
+        #genome.append(2.5)#beta = 2.5
+        #genome.append(1.0)#u0 = 1.0
+        #genome.append(0)#v1 = 0#1.0
+        #genome.append(0.0)#v2 = 0.0
+        #genome.append(2.0)#w21 = -2.0
+        #genome.append(-2.0)#w12 = -2.0
+        #genome.append(0.025)#tu = 0.025
+        #genome.append(0.3)#tv = 0.3
+        #genome.append(0.0)#u1 = 0.0
+        #genome.append(0)#u2 = 0#1.0
         return genome
 
     def getGenomeRange(self):
@@ -23,6 +33,18 @@ class Individual(abstract_function_class.AbstractFunctionClass):
         ranges = []
         for i in range(8*8):
             ranges.append([-1.5, 1.5])
+
+        # setting ranges for cpg parameters
+        ranges.append([0.5, 5])#beta = 2.5
+        ranges.append([0.5, 1.5])#u0 = 1.0
+        ranges.append([0, 1])#v1 = 0#1.0
+        ranges.append([0, 1])#v2 = 0.0
+        ranges.append([-3, -1])#w21 = -2.0
+        ranges.append([-3, -1])#w12 = -2.0
+        ranges.append([0.01, 0.1])#tu = 0.025
+        ranges.append([0.1, 0.5])#tv = 0.3
+        ranges.append([0, 1])#u1 = 0.0
+        ranges.append([0, 1])#u2 = 0#1.0
         return ranges
 
     def getFitness(self, genome):
@@ -41,8 +63,8 @@ print('Starting evolution...')
 
 start_time = time.time()
 
-populationSize = 10
-generations = 5
+populationSize = 4
+generations = 1
 
 myInd = Individual()
 ga = gen_alg.GenAlg(myInd, populationSize, initPopFilename)
