@@ -10,7 +10,7 @@ class BioloidNetwork:
         self.neighbours = [[1,2,5],[0,2,4],[0,1,3,6,7],[2,4,5,6,7],[1,3,5],[0,3,4],[2,3,7],[2,3,6]]
 
         if len(weightList) != (8*8+10):
-            print("Weight list was not of expected length! Using default values")
+            print("Weight list was not of expected length (" + str(len(weightList)) + ")! Using default values")
             self.nodes = self.create_joints()
         else:
             self.nodes = self.create_joints(weightList[64:len(weightList)])
@@ -20,7 +20,6 @@ class BioloidNetwork:
     def create_joints(self,jointParams = None):
         joint_list = []
         for i_node in range(len(self.neighbours)):
-            if(jointParams!=None)
             beta = jointParams[0] if jointParams else 2.5
             u0 = jointParams[1] if jointParams else 1.0
             v1 = jointParams[2] if jointParams else 0#1.0
