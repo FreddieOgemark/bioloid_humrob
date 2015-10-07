@@ -88,6 +88,7 @@ def evaluate_individual(weightMatrix):
         maxPosition = 0
         _, lastPos = vrep.simxGetObjectPosition(clientID, torsoHandle, -1, vrep.simx_opmode_oneshot_wait)
 
+
         bn = cpg.bioloid_network.BioloidNetwork(weightMatrix, deltaTime)
         for iteration in range(0,1200):
             # CPG network step
@@ -121,6 +122,9 @@ def evaluate_individual(weightMatrix):
                 forwardDistance = delta2D[0]*forward2D[0]+delta2D[1]*forward2D[1]
                 position += forwardDistance
                 maxPosition = max(position, maxPosition)
+                if currPos[2] < 0.1:
+                    print("ROBOT HAS FALLEN! Torso position z: " + str(currPos[2]))
+                    break
 
         # Measure movement
         print('Last known position: ' + str(position))
