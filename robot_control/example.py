@@ -3,7 +3,7 @@ from usbscan import *
 
 import time
 
-dev_name = scan_for_usb()
+dev_name = '/dev/ttyUSB0' #scan_for_usb()
 dyn = USB2Dynamixel_Device(dev_name)
 
 servos = []

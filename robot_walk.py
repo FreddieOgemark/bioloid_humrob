@@ -41,17 +41,21 @@ class BioloidControl:
         self.servoAngle[idx] = position
 
     def move(self, postUpdateDelay):
-        vel = math.radians(100.0)
+        vel = math.radians(40.0)
 
         for i in range(len(self.servos)):
-            servos[i].move_angle(self.servoAngle[i], vel, False) # True here means block call until movement done
+            rotationFactor = 1
+            if(i==1 or i==2):
+                rotationFactor = -1
 
-        pause(postUpdateDelay)
+            self.servos[i].move_angle(rotationFactor*self.servoAngle[i], vel, False) # True here means block call until movement done
+
+        time.sleep(postUpdateDelay)
 
 def evaluate_individual(genomeFileName):
     f = file_operation.FileOperations(genomeFileName)
     genome = f.showContent()
-    bioloid = BioloidControl();
+    bioloid = BioloidControl('/dev/ttyUSB0');
 
     if bioloid.dev_name:
         deltaTime = 0.01
@@ -61,7 +65,8 @@ def evaluate_individual(genomeFileName):
 
         # Shoulders should point downwards by default!
         # Join [15,13,9,12,14,16,1,2]
-        jointIndices = [14,12,8,11,13,15,0,1]
+        #jointIndices = [14,12,8,11,13,15,0,1] # TODO THIS IS CORRECT!
+        jointIndices = [14,12,10,11,13,15,0,1] #NOTE SWAPPED RIGHT FOOT
         jointOffsets = [0.0,0.0,0.0,0.0,0.0,0.0,-math.radians(90.0),-math.radians(90.0)]
 
         # Get handles
@@ -80,7 +85,7 @@ def evaluate_individual(genomeFileName):
         # Evaluate for a number of integration steps
         bn = cpg.bioloid_network.BioloidNetwork(genome, deltaTime)
         for iteration in range(0,200):
-            # CPG network step
+            # CPG network step+0.000e+00
             jointAngles = bn.get_output()
 
             # Set joint angles
@@ -92,4 +97,4 @@ def evaluate_individual(genomeFileName):
             
     print('Done.')
 
-evaluate_individual('genomeData/2015-10-02_15-51-12_bestGenome.csv')
+evaluate_individual('walkingPatterns/2015-10-03_bestGenome_nofalling.csv')
