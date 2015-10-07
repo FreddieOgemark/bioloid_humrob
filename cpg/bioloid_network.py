@@ -20,7 +20,6 @@ class BioloidNetwork:
     def create_joints(self,jointParams = None):
         joint_list = []
         for i_node in range(len(self.neighbours)):
-            if(jointParams!=None)
             beta = jointParams[0] if jointParams else 2.5
             u0 = jointParams[1] if jointParams else 1.0
             v1 = jointParams[2] if jointParams else 0#1.0
