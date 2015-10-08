@@ -3,9 +3,9 @@ import os
 class fileOperations:
 
     def __init__(self, folderName):
-        fileName = self.getLastGeneratedFile(folderName)
+        #fileName = self.getLastGeneratedFile(folderName)
         #print fileName
-        #fileName = "2015-10-02_13-41-35_bestGenome.csv"
+        fileName = '2015-10-03_bestGenome_nofalling.csv'
         self.lines = []
         self.parameterValues = []
         #with open(fileName) as f:

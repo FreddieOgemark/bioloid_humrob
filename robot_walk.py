@@ -58,7 +58,7 @@ class BioloidControl:
 def evaluate_individual(genomeFileName):
     f = file_operation.fileOperations(genomeFileName)
     genome = f.getContent()
-    bioloid = BioloidControl('/dev/ttyUSB1');
+    bioloid = BioloidControl();
 
     if bioloid.dev_name:
         deltaTime = 0.01

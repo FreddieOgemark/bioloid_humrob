@@ -37,7 +37,7 @@ def evaluate_individual(weightMatrix):
         deltaTime = 0.01
 
         # Shoulders should point downwards by default!
-        jointIndices = [15,13,9,12,14,16,1,2]
+        jointIndices = [15,13,11,12,14,16,1,2]
         jointOffsets = [0.0,0.0,0.0,0.0,0.0,0.0,-math.radians(90.0),math.radians(90.0)]
 
         # Get handles
@@ -72,10 +72,10 @@ def evaluate_individual(weightMatrix):
 
         # Set joints that are not considered by the optimizaton
         shoulderAngle = math.radians(80.0)
-        vrep.simxSetJointPosition(clientID, shoulderRightHandle, shoulderAngle, vrep.simx_opmode_oneshot_wait)
-        vrep.simxSetJointTargetPosition(clientID, shoulderRightHandle, shoulderAngle, vrep.simx_opmode_oneshot_wait)
-        vrep.simxSetJointPosition(clientID, shoulderLeftHandle, -shoulderAngle, vrep.simx_opmode_oneshot_wait)
-        vrep.simxSetJointTargetPosition(clientID, shoulderLeftHandle, -shoulderAngle, vrep.simx_opmode_oneshot_wait)
+        vrep.simxSetJointPosition(clientID, shoulderRightHandle, -shoulderAngle, vrep.simx_opmode_oneshot_wait)
+        vrep.simxSetJointTargetPosition(clientID, shoulderRightHandle, -shoulderAngle, vrep.simx_opmode_oneshot_wait)
+        vrep.simxSetJointPosition(clientID, shoulderLeftHandle, shoulderAngle, vrep.simx_opmode_oneshot_wait)
+        vrep.simxSetJointTargetPosition(clientID, shoulderLeftHandle, shoulderAngle, vrep.simx_opmode_oneshot_wait)
 
         hipAngle = math.radians(45.0)
         vrep.simxSetJointPosition(clientID, hipRightHandle, -hipAngle, vrep.simx_opmode_oneshot_wait)
