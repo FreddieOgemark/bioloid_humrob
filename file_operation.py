@@ -1,16 +1,18 @@
 import os
+import time
 
 class fileOperations:
 
     def __init__(self, folderName):
-        #fileName = self.getLastGeneratedFile(folderName)
+        
+        fileName = self.getLastGeneratedFile(folderName)
         #print fileName
-        fileName = '2015-10-03_bestGenome_nofalling.csv'
         self.lines = []
         self.parameterValues = []
         #with open(fileName) as f:
-        with open(os.path.join(folderName, fileName)) as f:
-            self.lines = self.lines + f.readlines()
+        if fileName is not None and len(fileName) > 0:
+            with open(os.path.join(folderName, fileName)) as f:
+                self.lines = self.lines + f.readlines()
             
 
     def getContent(self):
@@ -39,10 +41,15 @@ class fileOperations:
         maxDate = ""
         for fName in txtFilesInDir:
             #print fName[0:19]
-            if fName[0:19] >= maxDate:
-                #print "True"
-                maxDate = fName[0:19]
-                lastFile = fName
+            try:
+                validDateTime = time.strptime(fName[0:19],'%Y-%m-%d_%H-%M-%S')
+                if fName[0:19] >= maxDate:
+                    #print "True"
+                    maxDate = fName[0:19]
+                    lastFile = fName
+            except ValueError:
+                validDateTime = ""
+            
                 
         #print lastFile
         return lastFile
