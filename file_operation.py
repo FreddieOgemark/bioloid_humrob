@@ -4,9 +4,9 @@ import time
 class fileOperations:
 
     def __init__(self, folderName):
+        
         fileName = self.getLastGeneratedFile(folderName)
-        print fileName
-        #fileName = "2015-10-02_13-41-35_bestGenome.csv"
+        #print fileName
         self.lines = []
         self.parameterValues = []
         #with open(fileName) as f:
@@ -55,9 +55,10 @@ class fileOperations:
         return lastFile
                         
 
-f = fileOperations("D:\Alireza_UniDocuments\Chalmers University\Semester 3\Humanoid Robotics\Git\TIF160_Bioloid\walkingPatterns")
+#f = fileOperations("D:\Alireza_UniDocuments\Chalmers University\Semester 3\Humanoid Robotics\Git\TIF160_Bioloid\walkingPatterns")
+#f = fileOperations("walkingPatterns")
 
 #content = f.showContent()
 #print(content)
 
-print f.getContent()
+#print f.getContent()

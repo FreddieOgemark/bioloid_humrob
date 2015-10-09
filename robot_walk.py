@@ -6,7 +6,7 @@ import math
 import cpg.bioloid_network
 from robot_control.lib_robotis import *
 from robot_control.usbscan import *
-import file_Operation
+import file_operation
 
 class BioloidControl:
     def __init__(self, usbPort=None):
@@ -56,12 +56,15 @@ class BioloidControl:
         time.sleep(postUpdateDelay)
 
 def evaluate_individual(genomeFileName):
-    f = fileOperations(genomeFileName)
-    genome = f.showContent()
-    bioloid = BioloidControl('/dev/ttyUSB0');
+    f = file_operation.fileOperations(genomeFileName)
+    genome = f.getContent()
+    bioloid = BioloidControl();
 
-    if bioloid.devName:
+    if bioloid.dev_name:
         deltaTime = 0.01
+
+        # Wait 6 seconds for base pose to stabilize
+        bioloid.moveToBasePose(6.0)
 
         # Shoulders should point downwards by default!
         # Join [15,13,9,12,14,16,1,2]
@@ -89,7 +92,7 @@ def evaluate_individual(genomeFileName):
         #vrep.simxSetIntegerParameter(clientID, vrep.sim_intparam_speedmodifier, 10, vrep.simx_opmode_oneshot_wait)
 
         # Set initial joint angles
-        for i in range(0,len(jointHandles)):
+        for i in range(0,len(jointIndices)):
             bioloid.setJointPosition(jointIndices[i], jointOffsets[i])
 
         # Set joints that are not considered by the optimizaton
@@ -108,11 +111,11 @@ def evaluate_individual(genomeFileName):
             jointAngles = bn.get_output()
 
             # Set joint angles
-            for i in range(0,len(jointHandles)):
+            for i in range(0,len(jointIndices)):
                 bioloid.setJointPosition(jointIndices[i], jointOffsets[i] + jointAngles[i])
 
             # move robot
-            bioloid.move()
+            bioloid.move(deltaTime)
 
         # Stop robot (TODO : unnecessary here?)
 
@@ -140,5 +143,6 @@ class Bioloid:
             servos[i].move_angle(self.servoAngle[i], vel, True) # True here means block call until movement done
 
 
-evaluate_individual('walkingPatterns/2015-10-03_bestGenome_nofalling.csv')
+#evaluate_individual('walkingPatterns/2015-10-03_bestGenome_nofalling.csv')
+evaluate_individual('walkingPatterns')
 

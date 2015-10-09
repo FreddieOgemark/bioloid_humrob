@@ -5,29 +5,31 @@ class BioloidNetwork:
     def __init__(self, weightList, timestep):
         # we assume that the first 8*8 values in the weight list are weights for the network
         # and the rest are parameters for the cpg
-        if len(weightList) != (8*8+12):
-            print("Weight list was not of expected length!")
+        
         self.weights = get_weights_from_list(weightList[0:(8*8)], 8, 8)
         self.neighbours = [[1,2,5],[0,2,4],[0,1,3,6,7],[2,4,5,6,7],[1,3,5],[0,3,4],[2,3,7],[2,3,6]]
-        self.nodes = self.create_joints()
+
+        if len(weightList) != (8*8+10):
+            print("Bioloid Network input (" + str(len(weightList)) + ") was not of expected length (" + str(8*8+10) + ")! Using weights from file but default parameter values.")
+            self.nodes = self.create_joints()
+        else:
+            self.nodes = self.create_joints(weightList[64:len(weightList)])
         self.last_outputs = [1,1,1,1,1,1,1,1]
         self.timestep = timestep
 
-    def create_joints(self):
+    def create_joints(self,jointParams = None):
         joint_list = []
         for i_node in range(len(self.neighbours)):
-            beta = 2.5
-            u0 = 1.0
-            v1 = 0#1.0
-            v2 = 0.0
-            w21 = -2.0
-            w12 = -2.0
-            tu = 0.025
-            tv = 0.3
-            u1 = 0.0
-            u2 = 0#1.0
-            tu = 0.025
-            tv = 0.3
+            beta = jointParams[0] if jointParams else 2.5
+            u0 = jointParams[1] if jointParams else 1.0
+            v1 = jointParams[2] if jointParams else 0#1.0
+            v2 = jointParams[3] if jointParams else 0.0
+            w21 = jointParams[4] if jointParams else -2.0
+            w12 = jointParams[5] if jointParams else -2.0
+            tu = jointParams[6] if jointParams else 0.025
+            tv = jointParams[7] if jointParams else 0.3
+            u1 = jointParams[8] if jointParams else 0.0
+            u2 = jointParams[9] if jointParams else 0#1.0
             # Increase speed for knees
             #if i_node in [1,2,3,4]:
                 #tu = tu/2
