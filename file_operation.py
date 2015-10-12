@@ -6,7 +6,7 @@ class fileOperations:
     def __init__(self, folderName):
         
         fileName = self.getLastGeneratedFile(folderName)
-        #print fileName
+        print('Using file: ' + str(fileName))
         self.lines = []
         self.parameterValues = []
         #with open(fileName) as f:
