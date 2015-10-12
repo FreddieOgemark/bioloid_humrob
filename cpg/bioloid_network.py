@@ -11,7 +11,7 @@ class BioloidNetwork:
         #self.weights = get_weights_from_list(weightList[0:(8*8)], 8, 8)
 
         if len(weightList) != (28+10):
-            print("Bioloid Network input (" + str(len(weightList)) + ") was not of expected length (" + str(8*8+10) + ")! Using weights from file but default parameter values.")
+            print("Bioloid Network input (" + str(len(weightList)) + ") was not of expected length (" + str(28+10) + ")! Using weights from file but default parameter values.")
             self.nodes = self.create_joints()
         else:
             self.nodes = self.create_joints(weightList[28:len(weightList)])

@@ -84,7 +84,8 @@ class GenAlg:
             for i in range(len(valueStrings)):
                 genome.append(float(valueStrings[i]))
             if(len(genome)==74):
-                genome = pruneGenome(genome)
+                print(genome)
+                genome = self.pruneGenome(genome)
             population.append(genome)
         return population
 
@@ -251,15 +252,20 @@ class GenAlg:
         populationFile.close()
         print("Population should be written to file")
 
-    def pruneGenome(oldGenome):
+    def pruneGenome(self,oldGenome):
         wantedWeights = [[1,2,5],[0,2,4],[0,1,3,6,7],[2,4,5,6,7],[1,3,5],[0,3,4],[2,3,7],[2,3,6]]
         newGenome = []
         index = 0;
+        #get weights
         for i in range(8):
             currentWantedWeights = wantedWeights[i]
             for j in range(8):
                 if j in currentWantedWeights:
                     newGenome.append(oldGenome[index])
                 index += 1
+        #get inner parameters
+        for i in range(index, len(oldGenome)):
+            newGenome.append(oldGenome[i])
+
         return newGenome
 
