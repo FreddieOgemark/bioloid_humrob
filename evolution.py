@@ -31,7 +31,7 @@ class Individual(abstract_function_class.AbstractFunctionClass):
         # and parameter 2 in the genome has the allowed range (3, 5), then this function
         # should return the list [[-2, 3], [3, 5], ...]
         ranges = []
-        for i in range(8*8):
+        for i in range(28):
             ranges.append([-1.5, 1.5])
 
         # setting ranges for cpg parameters

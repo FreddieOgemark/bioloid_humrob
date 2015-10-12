@@ -76,13 +76,15 @@ class GenAlg:
             # each line is a genome
             genome = []
             line = allLines[k]
-            valueStrings = line.split(",")
-            if (len(valueStrings) != expectedGenomeLength):
+            valueStrings = line.split(",")    
+            if (len(valueStrings) != expectedGenomeLength and len(valueStrings) != 74):
                 # Can't read genome since it has wrong length!
                 print("ERROR: Genome in initial population had length", len(valueStrings), "while the expected genome length was", expectedGenomeLength)
                 return None
             for i in range(len(valueStrings)):
                 genome.append(float(valueStrings[i]))
+            if(len(genome)==74):
+                genome = pruneGenome(genome)
             population.append(genome)
         return population
 
@@ -243,4 +245,16 @@ class GenAlg:
         populationFile.write(outputText)
         populationFile.close()
         print("Population should be written to file")
+
+    def pruneGenome(oldGenome):
+        wantedWeights = [[1,2,5],[0,2,4],[0,1,3,6,7],[2,4,5,6,7],[1,3,5],[0,3,4],[2,3,7],[2,3,6]]
+        newGenome = []
+        index = 0;
+        for i in range(8):
+            currentWantedWeights = wantedWeights[i]
+            for j in range(8):
+                if j in currentWantedWeights:
+                    newGenome.append(oldGenome[index])
+                index += 1
+        return newGenome
 
