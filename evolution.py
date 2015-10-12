@@ -36,15 +36,15 @@ class Individual(abstract_function_class.AbstractFunctionClass):
 
         # setting ranges for cpg parameters
         ranges.append([0.5, 5])#beta = 2.5
-        ranges.append([0.5, 1.5])#u0 = 1.0
-        ranges.append([0, 1])#v1 = 0#1.0
-        ranges.append([0, 1])#v2 = 0.0
+        ranges.append([1, 1])#u0 = 1.0    #changed from [0.5, 1.5]
+        ranges.append([1, 1])#v1 = 0#1.0  #changed from [0, 1]
+        ranges.append([0, 0])#v2 = 0.0    #changed from [0, 1]
         ranges.append([-3, -1])#w21 = -2.0
         ranges.append([-3, -1])#w12 = -2.0
         ranges.append([0.01, 0.1])#tu = 0.025
         ranges.append([0.1, 0.5])#tv = 0.3
-        ranges.append([0, 1])#u1 = 0.0
-        ranges.append([0, 1])#u2 = 0#1.0
+        ranges.append([0, 0])#u1 = 0.0    #changed from [0, 1]
+        ranges.append([1, 1])#u2 = 0#1.0  #changed from [0, 1]
         return ranges
 
     def getFitness(self, genome):
@@ -63,7 +63,7 @@ print('Starting evolution...')
 
 start_time = time.time()
 
-populationSize = 10
+populationSize = 15
 generations = 20
 
 myInd = Individual()
