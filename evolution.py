@@ -41,8 +41,8 @@ class Individual(abstract_function_class.AbstractFunctionClass):
         ranges.append([0, 0])#v2 = 0.0    #changed from [0, 1]
         ranges.append([-3, -1])#w21 = -2.0
         ranges.append([-3, -1])#w12 = -2.0
-        ranges.append([0.01, 0.1])#tu = 0.025
-        ranges.append([0.1, 0.5])#tv = 0.3
+        ranges.append([0.01, 5])#tu = 0.025  #changed from [0.01, 0.1]
+        ranges.append([0.01, 5])#tv = 0.3    #changed from [0.1, 0.5]
         ranges.append([0, 0])#u1 = 0.0    #changed from [0, 1]
         ranges.append([1, 1])#u2 = 0#1.0  #changed from [0, 1]
         return ranges
@@ -63,8 +63,8 @@ print('Starting evolution...')
 
 start_time = time.time()
 
-populationSize = 15
-generations = 20
+populationSize = 10
+generations = 5
 
 myInd = Individual()
 ga = gen_alg.GenAlg(myInd, populationSize, initPopFilename)

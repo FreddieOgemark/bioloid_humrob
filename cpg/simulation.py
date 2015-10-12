@@ -63,7 +63,7 @@ def evaluate_individual(weightMatrix):
         print('Sim started.')
 
         # Speed up simulation
-        #vrep.simxSetIntegerParameter(clientID, vrep.sim_intparam_speedmodifier, -1, vrep.simx_opmode_oneshot_wait)
+        #vrep.simxSetIntegerParameter(clientID, vrep.sim_intparam_speedmodifier, 10, vrep.simx_opmode_oneshot_wait)
 
         # Set initial joint angles
         for i in range(0,len(jointHandles)):
@@ -92,7 +92,7 @@ def evaluate_individual(weightMatrix):
 
 
         bn = cpg.bioloid_network.BioloidNetwork(weightMatrix, deltaTime)
-        for iteration in range(0,1200):
+        for iteration in range(0,2000):
             # CPG network step
             jointAngles = bn.get_output()
 
@@ -146,7 +146,7 @@ def evaluate_individual(weightMatrix):
     testFitness = maxPosition*lowestPos
     #print("Cumulative z pos is is " + str(cumZPos))
     #return cumZPos
-    return testFitness
-    #return maxPosition
+    #return testFitness
+    return maxPosition
 
 #evaluate_individual(bioloid_network.get_random_weights(8,8))
