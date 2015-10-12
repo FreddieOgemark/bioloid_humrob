@@ -110,7 +110,9 @@ def run(genomeDir):
     print('Starting run!')
     bn = cpg.bioloid_network.BioloidNetwork(genome, deltaTime)
 
-    for iteration in range(0,800):
+    for iteration in range(0,2000):
+        startTime = time.clock()
+
         # CPG network step
         jointAngles = bn.get_output()
 
@@ -121,7 +123,9 @@ def run(genomeDir):
         robot.setServoTargets(dict(zip(jointIndices, output)), False)
 
         # Wait until next timestep
-        time.sleep(deltaTime)
+        updateTime = time.clock() - startTime
+        
+        time.sleep(deltaTime - updateTime)
 
     print('Run ended!')
 
