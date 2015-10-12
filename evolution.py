@@ -63,8 +63,8 @@ print('Starting evolution...')
 
 start_time = time.time()
 
-populationSize = 5
-generations = 3
+populationSize = 10
+generations = 20
 
 myInd = Individual()
 ga = gen_alg.GenAlg(myInd, populationSize, initPopFilename)

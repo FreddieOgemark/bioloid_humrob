@@ -142,11 +142,16 @@ class GenAlg:
         # for each gene in the genome
         for i in range(len(ranges)):
             if (random.random() < probMut):
-                change = (ranges[i][1] - ranges[i][0])*0.05 # max 10 % of total range interval
+                change = (ranges[i][1] - ranges[i][0])*0.05 # 5 % of total range interval
                 # mutate
                 if (random.random() < 0.7):
                     # creep mutation
-                    genome[i] = genome[i] + (random.random()*change - change/2)
+
+                    # uniform version
+                    # genome[i] = genome[i] + (random.random()*change - change/2)
+
+                    # gaussian version, 95 % within [-change, change]
+                    genome[i] = random.gauss(genome[i], change/2)
                 else:
                     # random mutation
                     genome[i] = ranges[i][0] + random.random()*(ranges[i][1]-ranges[i][0])
