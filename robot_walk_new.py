@@ -53,7 +53,7 @@ class BioloidControl:
 
     def moveToBasePose(self):
         print('Moving to base pose...')
-        speeds = dict(zip(self.ids, itertools.repeat(150)))
+        speeds = dict(zip(self.ids, itertools.repeat(50)))
         self.setServoSpeeds(speeds)
 
         positions = { 1: 0.0,
