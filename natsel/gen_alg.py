@@ -168,7 +168,15 @@ class GenAlg:
             # get robot's score/fitness (by simulating it)
             self.currentFitness[i] = self.functionClass.getFitness(self.currentGenomes[i])
             print("Robot is finished")
-            print("Fitness: " + str(self.currentFitness[i]))
+            if (self.currentFitness[i] > self.bestFitness):
+                # save the globally best genome (over all time)
+                self.bestFitness = self.currentFitness[i]
+                self.bestGenome = self.currentGenomes[i]
+                print("*** New best fitness found! ", self.bestFitness)
+            fitnessString = "Fitness: " + str(self.currentFitness[i])
+            if (self.bestFitness > 0):
+                fitnessString = fitnessString + "  (that's " + str(round((self.currentFitness[i]/self.bestFitness)*100, 2)) + " % of best fitness found!)"
+            print(fitnessString)
 
             print("")
 
@@ -181,11 +189,6 @@ class GenAlg:
         print("Index of best in generation: " + str(bestInGenerationIndex))
         #print("Genome: " + self.genomeToString(self.currentGenomes[bestInGenerationIndex]))
         newGenomes.append(self.currentGenomes[bestInGenerationIndex])
-        if (self.currentFitness[bestInGenerationIndex] > self.bestFitness):
-            # save the globally best genome (over all time)
-            self.bestFitness = self.currentFitness[bestInGenerationIndex]
-            self.bestGenome = self.currentGenomes[bestInGenerationIndex]
-            print("*** New best fitness found! ", self.bestFitness)
 
         for i in range(1, self.nrIndividualsPerGeneration):
             newGenomes.append([]) # create new position for genome
@@ -230,7 +233,7 @@ class GenAlg:
         timestampString = timestamp.strftime('%Y-%m-%d_%H-%M-%S')
 
         genomeFileName = "bestGenome"
-        genomeFile = open(dataFolder + timestampString + "_" + genomeFileName + ".csv", 'w')
+        genomeFile = open(dataFolder + timestampString + "_" + genomeFileName + "_" + str(round(self.bestFitness, 3)) + ".csv", 'w')
         line = ""
         for i in range(len(self.bestGenome)):
             line = line + str(self.bestGenome[i]) + ","
@@ -240,7 +243,7 @@ class GenAlg:
         print("Best genome should be written to file")
 
         populationFileName = "population"
-        populationFile = open(dataFolder + timestampString + "_" + populationFileName + ".csv", 'w')
+        populationFile = open(dataFolder + timestampString + "_" + populationFileName + "_" + str(round(self.bestFitness, 3)) + ".csv", 'w')
         outputText = ""
         for k in range(len(self.currentGenomes)):
             line = ""
