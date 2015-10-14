@@ -166,7 +166,7 @@ def evaluate_individual(weightMatrix):
     #fitness = maxPosition
 
     # Only return valid fitness values
-    if math.isnan(fitness) or fitness >= 1000.0:
+    if math.isnan(fitness) or fitness >= 1000.0 or math.isnan(position):
         fitness = 0.0
 
     return fitness
