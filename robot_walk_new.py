@@ -7,7 +7,45 @@ import pypot.dynamixel
 import cpg.bioloid_network
 
 class BioloidControl:
-    def __init__(self):
+    servoMinLimits = [  -145,
+                        -125,
+                        -60,
+                        -85,
+                        -30,
+                        -40,
+                        -55,
+                        30,
+                        0,
+                        0,
+                        -80,
+                        -20,
+                        -90,
+                        0,
+                        -20,
+                        -80,
+                        -30,
+                        -30 ]
+
+    servoMaxLimits = [  125,
+                        145,
+                        85,
+                        60,
+                        40,
+                        30,
+                        -30,
+                        55,
+                        0,
+                        0,
+                        20,
+                        80,
+                        0,
+                        90,
+                        80,
+                        20,
+                        30,
+                        30 ]
+
+    def __init__(self, initServoSpeed):
         # Connect to bioloid
         print('Connecting to bioloid robot...')
         ports = pypot.dynamixel.get_available_ports()
@@ -29,9 +67,14 @@ class BioloidControl:
         if len(found_ids) != 18:
             raise IOError('Not all 18 servos were found!')
 
+        # Enable servo torque
         self.ids = found_ids
         self.dxl_io.enable_torque(self.ids)
         time.sleep(0.01)
+
+        # Set initial servo speeds
+        speeds = dict(zip(self.ids, itertools.repeat(initServoSpeed)))
+        self.setServoSpeeds(speeds)
 
         print('BioloidControl initialized.')
 
@@ -47,33 +90,43 @@ class BioloidControl:
         time.sleep(0.01)
 
     def setServoTargets(self, positions, delay = True):
-        self.dxl_io.set_goal_position(positions)
+        # note: positions is a dictionary
+
+        # Clamp target positions to valid range
+        clampedPositions = {}
+
+        for servoID, pos in positions.iteritems():
+            pos = max(pos, self.servoMinLimits[servoID-1])
+            pos = min(pos, self.servoMaxLimits[servoID-1])
+            clampedPositions[servoID] = pos
+
+        # Set positions
+        self.dxl_io.set_goal_position(clampedPositions)
+
         if delay:
             time.sleep(0.01)
 
     def moveToBasePose(self):
         print('Moving to base pose...')
-        speeds = dict(zip(self.ids, itertools.repeat(50)))
-        self.setServoSpeeds(speeds)
+        positions = {   1: 0.0,
+                        2: 0.0,
+                        3: 0.0,
+                        4: 0.0,
+                        5: 0.0,
+                        6: 0.0,
+                        7: -45.0,
+                        8: 45.0,
+                        9: 0.0,
+                        10: 0.0,
+                        11: 0.0,
+                        12: 0.0, 
+                        13: 0.0,
+                        14: 0.0,
+                        15: 0.0,
+                        16: 0.0,
+                        17: 0.0,
+                        18: 0.0 }
 
-        positions = { 1: 0.0,
-                    2: 0.0,
-                    3: 0.0,
-                    4: 0.0,
-                    5: 0.0,
-                    6: 0.0,
-                    7: -45.0,
-                    8: 45.0,
-                    9: 0.0,
-                    10: 0.0,
-                    11: 0.0,
-                    12: 0.0, 
-                    13: 0.0,
-                    14: 0.0,
-                    15: 0.0,
-                    16: 0.0,
-                    17: 0.0,
-                    18: 0.0 }
         self.setServoTargets(positions)
 
         # Wait for movement to complete
@@ -84,7 +137,7 @@ def run(genomeDir):
     f = file_operation.fileOperations(genomeDir)
     genome = f.getContent()
 
-    robot = BioloidControl()
+    robot = BioloidControl(120) # INITIAL SPEED IS SET HERE
     robot.moveToBasePose()
 
     # Run
