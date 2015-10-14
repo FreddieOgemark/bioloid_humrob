@@ -27,4 +27,17 @@ class MatsuokaJoint:
         self.y1 = max(self.u1,0)
         self.y2 = max(self.u2,0)
         y = self.y2 - self.y1
+        if math.isnan(y):
+            print('Got nan with parameters:')
+            print(self.beta)
+            print(self.u0)
+            print(self.v1)
+            print(self.v2)
+            print(self.w21)
+            print(self.w12)
+            print(self.tu)
+            print(self.tv)
+            print(self.u1)
+            print(self.u2)
+        y = 0
         return y

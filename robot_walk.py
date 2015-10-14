@@ -44,7 +44,7 @@ class BioloidControl:
         self.servoAngle[idx] = position
 
     def move(self, postUpdateDelay):
-        vel = math.radians(40.0)
+        vel = math.radians(50.0)
 
         for i in range(len(self.servos)):
             rotationFactor = 1
@@ -58,13 +58,13 @@ class BioloidControl:
 def evaluate_individual(genomeFileName):
     f = file_operation.fileOperations(genomeFileName)
     genome = f.getContent()
-    bioloid = BioloidControl();
+    bioloid = BioloidControl('/dev/ttyUSB0');
 
     if bioloid.dev_name:
         deltaTime = 0.01
 
-        # Wait 6 seconds for base pose to stabilize
-        bioloid.moveToBasePose(6.0)
+        # Wait 12 seconds for base pose to stabilize
+        bioloid.moveToBasePose(9.0)
 
         # Shoulders should point downwards by default!
         # Join [15,13,9,12,14,16,1,2]
@@ -106,7 +106,7 @@ def evaluate_individual(genomeFileName):
         #lastPos = vrep.simxGetObjectPosition(clientID, torsoHandle, -1, vrep.simx_opmode_oneshot_wait)
 
         bn = cpg.bioloid_network.BioloidNetwork(genome, deltaTime)
-        for iteration in range(0,200):
+        for iteration in range(0,2000):
             # CPG network step+0.000e+00
             jointAngles = bn.get_output()
 
@@ -137,7 +137,7 @@ class Bioloid:
         self.servoAngle[idx] = position
 
     def move(self):
-        vel = math.radians(100.0)
+        vel = math.radians(50.0)
         # Base-pose:
         for i in range(len(self.servos)):
             servos[i].move_angle(self.servoAngle[i], vel, True) # True here means block call until movement done
