@@ -32,19 +32,19 @@ class Individual(abstract_function_class.AbstractFunctionClass):
         # should return the list [[-2, 3], [3, 5], ...]
         ranges = []
         for i in range(28):
-            ranges.append([-1.5, 1.5])
+            ranges.append([-2, 2])
 
         # setting ranges for cpg parameters
         ranges.append([0.5, 5])#beta = 2.5
-        ranges.append([1, 1])#u0 = 1.0    #changed from [0.5, 1.5]
-        ranges.append([1, 1])#v1 = 0#1.0  #changed from [0, 1]
-        ranges.append([0, 0])#v2 = 0.0    #changed from [0, 1]
-        ranges.append([-3, -1])#w21 = -2.0
-        ranges.append([-3, -1])#w12 = -2.0
-        ranges.append([0.01, 5])#tu = 0.025  #changed from [0.01, 0.1]
-        ranges.append([0.01, 5])#tv = 0.3    #changed from [0.1, 0.5]
-        ranges.append([0, 0])#u1 = 0.0    #changed from [0, 1]
-        ranges.append([1, 1])#u2 = 0#1.0  #changed from [0, 1]
+        ranges.append([1, 1])#u0 = 1.0    #changed from [0.5, 1.5] - [1, 1]
+        ranges.append([1, 1])#v1 = 0#1.0  #changed from [0, 1] - [1, 1]
+        ranges.append([0, 0])#v2 = 0.0    #changed from [0, 1] - [0, 0]
+        ranges.append([-2.5, -0.5])#w21 = -2.0  #changed from [-3, -1]
+        ranges.append([-2.5, -0.5])#w12 = -2.0  #changed from [-3, -1]
+        ranges.append([0.01, 0.5])#tu = 0.025  #changed from [0.01, 0.1]
+        ranges.append([0.01, 0.5])#tv = 0.3    #changed from [0.1, 0.5]
+        ranges.append([0, 0])#u1 = 0.0    #changed from [0, 1] - [0, 0]
+        ranges.append([1, 1])#u2 = 0#1.0  #changed from [0, 1] - [1, 1]
         return ranges
 
     def getFitness(self, genome):
@@ -63,8 +63,8 @@ print('Starting evolution...')
 
 start_time = time.time()
 
-populationSize = 10
-generations = 5
+populationSize = 15
+generations = 20
 
 myInd = Individual()
 ga = gen_alg.GenAlg(myInd, populationSize, initPopFilename)
