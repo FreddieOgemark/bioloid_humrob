@@ -135,7 +135,7 @@ def evaluate_individual(weightMatrix):
 
                 if math.isnan(position):
                     print('ROBOT POSITION IS NAN! Returning zero fitness.')
-                    return 0.0
+                    break
 
                 if currPos[2] < 0.1:
                     print('ROBOT HAS FALLEN! Stopping evaluation.')
