@@ -90,7 +90,7 @@ def evaluate_individual(weightMatrix):
         maxPosition = 0
         lowestPos = 5 #starting way above
         cumZPos = 0
-
+        furthestDistanceIteration = 0
 
         bn = cpg.bioloid_network.BioloidNetwork(weightMatrix, deltaTime)
         nrIterations = 2000;
@@ -129,6 +129,9 @@ def evaluate_individual(weightMatrix):
                 # What is the distance along the forward vector?
                 forwardDistance = delta2D[0]*forward2D[0]+delta2D[1]*forward2D[1]
                 position += forwardDistance
+                if position > maxPosition:
+                    # save new best furthestDistanceIteration
+                    furthestDistanceIteration = iteration
                 maxPosition = max(position, maxPosition)
                 lowestPos = min(lowestPos, currPos[2])
                 cumZPos += currPos[2]
@@ -139,6 +142,11 @@ def evaluate_individual(weightMatrix):
 
                 if currPos[2] < 0.1:
                     print('ROBOT HAS FALLEN! Stopping evaluation.')
+                    break
+
+                if iteration - furthestDistanceIteration > 300:
+                    # if we haven't improved the max distance for in 300 iterations, break
+                    print('ROBOT IS NOT MOVING FORWARD! Stopping evaluation.')
                     break
 
         # Measure movement
