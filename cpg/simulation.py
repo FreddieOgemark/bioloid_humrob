@@ -84,9 +84,10 @@ def evaluate_individual(weightMatrix):
         vrep.simxSetJointTargetPosition(clientID, hipLeftHandle, hipAngle, vrep.simx_opmode_oneshot_wait)
 
         # Evaluate for a number of integration steps
+        _, lastPos = vrep.simxGetObjectPosition(clientID, torsoHandle, -1, vrep.simx_opmode_oneshot_wait)
+
         position = 0
         maxPosition = 0
-        _, lastPos = vrep.simxGetObjectPosition(clientID, torsoHandle, -1, vrep.simx_opmode_oneshot_wait)
         lowestPos = 5 #starting way above
         cumZPos = 0
 
@@ -94,8 +95,10 @@ def evaluate_individual(weightMatrix):
         bn = cpg.bioloid_network.BioloidNetwork(weightMatrix, deltaTime)
         nrIterations = 2000;
         for iteration in range(0,nrIterations):
+            # Print progress
             if iteration % 100 == 0:
                 print("Evaluation iteration: " + str(iteration) + " / " + str(nrIterations))
+
             # CPG network step
             jointAngles = bn.get_output()
 
@@ -108,7 +111,7 @@ def evaluate_individual(weightMatrix):
 
             # Measure how far forward the robot moves in this timestep
             if iteration % 10 == 0:
-                # Measure delta (current - last position)
+                # Measure delta
                 _, currPos = vrep.simxGetObjectPosition(clientID, torsoHandle, -1, vrep.simx_opmode_oneshot_wait)
                 delta2D = [currPos[0]-lastPos[0], currPos[1]-lastPos[1]]
                 lastPos = currPos
@@ -129,15 +132,19 @@ def evaluate_individual(weightMatrix):
                 maxPosition = max(position, maxPosition)
                 lowestPos = min(lowestPos, currPos[2])
                 cumZPos += currPos[2]
-                #print("cumZPos: " + str(cumZPos))
+
+                if math.isnan(position):
+                    print('ROBOT POSITION IS NAN! Returning zero fitness.')
+                    return 0.0
+
                 if currPos[2] < 0.1:
-                    print("ROBOT HAS FALLEN! Torso position z: " + str(currPos[2]))
+                    print('ROBOT HAS FALLEN! Stopping evaluation.')
                     break
 
         # Measure movement
         print('Last known position: ' + str(position))
-        print('Max position (fitness):' + str(maxPosition))
-        print('Lowest position:' + str(lowestPos))
+        print('Max position: ' + str(maxPosition))
+        print('Lowest position: ' + str(lowestPos))
 
         # Stop simulation
         vrep.simxSynchronous(clientID, False)
@@ -146,10 +153,14 @@ def evaluate_individual(weightMatrix):
         
 
     print('Done.')
-    testFitness = maxPosition*lowestPos
-    #print("Cumulative z pos is is " + str(cumZPos))
-    #return cumZPos
-    return testFitness
-    #return maxPosition
+    fitness = maxPosition*lowestPos
+    #fitness = cumZPos    
+    #fitness = maxPosition
+
+    # Only return valid fitness values
+    if math.isnan(fitness) or fitness >= 1000.0:
+        fitness = 0.0
+
+    return fitness
 
 #evaluate_individual(bioloid_network.get_random_weights(8,8))
