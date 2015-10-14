@@ -92,9 +92,10 @@ def evaluate_individual(weightMatrix):
 
 
         bn = cpg.bioloid_network.BioloidNetwork(weightMatrix, deltaTime)
-        for iteration in range(0,2000):
+        nrIterations = 2000;
+        for iteration in range(0,nrIterations):
             if iteration % 100 == 0:
-                print("Evaluation iteration: " + str(iteration))
+                print("Evaluation iteration: " + str(iteration) + " / " + str(nrIterations))
             # CPG network step
             jointAngles = bn.get_output()
 
