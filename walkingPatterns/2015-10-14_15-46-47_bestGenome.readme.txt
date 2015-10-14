@@ -1,0 +1,10 @@
+                #input1 += self.last_outputs[i_neighbour]*self.weights[i_node][i_neighbour] 
+                input1 += max(self.last_outputs[i_neighbour],0)*self.weights[i_node][i_neighbour] 
+                input2 += min(self.last_outputs[i_neighbour],0)*self.weights[i_node][i_neighbour]
+
+            #if i_node in [1,2,3,4]:
+                #tu = tu/2
+                #tv = tv/2 
+
+
+120 degrees/second
