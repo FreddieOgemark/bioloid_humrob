@@ -31,7 +31,7 @@ class GenAlg:
         self.functionClass = functionClass
         self.nrIndividualsPerGeneration = nrIndividualsPerGeneration
         genomeLength = len(self.functionClass.getGenomeRange())
-        self.pMut = 1/genomeLength
+        self.pMut = 1.0/float(genomeLength)
         print("pMut set to " + str(self.pMut))
 
         successReadingInitPop = False
